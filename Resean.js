@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
 
-export default function Reason() {
+export default function Reason({ navigation }) {
   const [selectedOptions, setSelectedOptions] = useState([]);
 
   const options = [
@@ -48,9 +48,10 @@ export default function Reason() {
           style={styles.list}
         />
 
-        <TouchableOpacity style={styles.continueButton}>
+        <TouchableOpacity style={styles.continueButton} onPress={() => navigation.navigate('Home')}>
           <Text style={styles.buttonText}>Continue</Text>
         </TouchableOpacity>
+
       </View>
     </View>
   );
