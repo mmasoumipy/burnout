@@ -48,7 +48,7 @@ export default function Reason({ navigation }) {
           style={styles.list}
         />
 
-        <TouchableOpacity style={styles.continueButton} onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity style={styles.continueButton} onPress={() => navigation.navigate('HomePlan')}>
           <Text style={styles.buttonText}>Continue</Text>
         </TouchableOpacity>
 
