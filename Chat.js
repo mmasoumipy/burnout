@@ -133,10 +133,10 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 20,
-        backgroundColor: '#E0E0E0',
+        backgroundColor: '#B8CDD9',
     },
     activeTabButton: {
-        backgroundColor: '#BCCCDC',
+        backgroundColor: '#5D92B1',
     },
     tabText: {
         fontSize: 16,

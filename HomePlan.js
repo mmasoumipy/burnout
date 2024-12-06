@@ -110,16 +110,16 @@ export default function HomePlan({ navigation }) {
 
             {/* Bottom Navigation */}
             <View style={styles.navbar}>
-                <TouchableOpacity style={styles.navItem}>
-                <Image source={require('./assets/home_choose.png')} style={styles.navIcon} />
+            <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('HomePlan')}  >
+                <Image source={require('./assets/home_choose.png')} style={styles.navIcon}/>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
-                <Image source={require('./assets/search.png')} style={styles.navIcon} />
+                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Explore')} >
+                <Image source={require('./assets/search.png')} style={styles.navIcon}  />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
-                <Image source={require('./assets/chat.png')} style={styles.navIcon} />
+                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Chat')}>
+                <Image source={require('./assets/chat.png')} style={styles.navIcon}  />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
+                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Profile')}  >
                 <Image source={require('./assets/profile.png')} style={styles.navIcon} />
                 </TouchableOpacity>
             </View>
@@ -131,7 +131,6 @@ export default function HomePlan({ navigation }) {
 const styles = StyleSheet.create({
     container: { 
         flex: 1, 
-        backgroundColor: '#FAF9F6',
     },
     content: {
         flex: 1,
@@ -158,10 +157,10 @@ const styles = StyleSheet.create({
         borderRadius: 50, // Half of the width for circular buttons
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#E0E0E0',
+        backgroundColor: '#B8CDD9',
     },
     selectedMood: {
-        backgroundColor: '#007AFF', // Highlight selected mood
+        backgroundColor: '#5D92B1', 
     },
     moodImage: {
         width: 40,
@@ -183,13 +182,14 @@ const styles = StyleSheet.create({
         padding: 10, 
         marginHorizontal: 10, 
         borderRadius: 20, 
-        backgroundColor: '#E0E0E0' 
+        backgroundColor: '#B8CDD9', 
     },
     activeTab: { 
-        backgroundColor: '#007AFF' 
+        backgroundColor: '#5D92B1', 
     },
     tabText: { 
-        fontSize: 16, color: '#FFFFFF' 
+        fontSize: 16, 
+        color: '#000' 
     },
     sectionTitle: { 
         fontSize: 20, 

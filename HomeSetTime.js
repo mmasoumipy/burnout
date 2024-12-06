@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 
 export default function HomeSetTime({ navigation }) {
-    const [selectedTime, setSelectedTime] = useState(null); // Default tab
+    const [selectedTab, setSelectedTab] = useState('Set Your Time');
+    const [selectedTime, setSelectedTime] = useState('5 min'); // Default tab
 
     const [selectedMood, setSelectedMood] = useState(null);
 
@@ -60,7 +61,25 @@ export default function HomeSetTime({ navigation }) {
                             <Image source={mood.image} style={styles.moodImage} />
                             </TouchableOpacity>
                         ))}
-                </View>
+                    </View>
+
+                    {/* Buttons */}
+                    <View style={styles.buttons}>
+                        <TouchableOpacity
+                            style={[styles.tabButton, selectedTab === 'Your Plan' && styles.activeTab]}
+                            onPress={() => navigation.navigate('HomePlan')
+                            }
+                        >
+                            <Text style={styles.tabText}>Your plan</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.tabButton, selectedTab === 'Set Your Time' && styles.activeTab]}
+                            onPress={() => setSelectedTab('Set Your Time')
+                            }
+                        >
+                            <Text style={styles.tabText}>Set your time</Text>
+                        </TouchableOpacity>
+                    </View>
         
                 {/* Time Options */}
                 <ScrollView
@@ -108,16 +127,16 @@ export default function HomeSetTime({ navigation }) {
 
             {/* Bottom Navigation */}
             <View style={styles.navbar}>
-                <TouchableOpacity style={styles.navItem}>
-                <Image source={require('./assets/home_choose.png')} style={styles.navIcon} />
+            <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('HomePlan')}  >
+                <Image source={require('./assets/home_choose.png')} style={styles.navIcon}/>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
-                <Image source={require('./assets/search.png')} style={styles.navIcon} />
+                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Explore')} >
+                <Image source={require('./assets/search.png')} style={styles.navIcon}  />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
-                <Image source={require('./assets/chat.png')} style={styles.navIcon} />
+                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Chat')}>
+                <Image source={require('./assets/chat.png')} style={styles.navIcon}  />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
+                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Profile')}  >
                 <Image source={require('./assets/profile.png')} style={styles.navIcon} />
                 </TouchableOpacity>
             </View>
@@ -163,14 +182,33 @@ export default function HomeSetTime({ navigation }) {
             borderRadius: 50, // Half of the width for circular buttons
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor: '#E0E0E0',
+            backgroundColor: '#B8CDD9',
         },
         selectedMood: {
-            backgroundColor: '#007AFF', // Highlight selected mood
+            backgroundColor: '#5D92B1', 
         },
         moodImage: {
             width: 40,
             height: 40,
+        },
+        buttons: { 
+            flexDirection: 'row', 
+            justifyContent: 'left', 
+            marginBottom: 8,
+            marginTop: 24,
+        },
+        tabButton: { 
+            padding: 10, 
+            marginHorizontal: 10, 
+            borderRadius: 20, 
+            backgroundColor: '#B8CDD9', 
+        },
+        activeTab: { 
+            backgroundColor: '#5D92B1', 
+        },
+        tabText: { 
+            fontSize: 16, 
+            color: '#000' 
         },
         timeContainer: {
           flexDirection: 'row',
@@ -179,15 +217,15 @@ export default function HomeSetTime({ navigation }) {
         timeButton: {
           padding: 10,
           borderRadius: 20,
-          backgroundColor: '#E0E0E0',
+          backgroundColor: '#B3CBD9',
           marginHorizontal: 5,
         },
         selectedTime: {
-          backgroundColor: '#007AFF',
+          backgroundColor: '#5D92B1',
         },
         timeText: {
           fontSize: 16,
-          color: '#FFFFFF',
+          color: '#66',
         },
         sectionTitle: {
           fontSize: 20,

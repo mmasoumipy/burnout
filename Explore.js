@@ -23,7 +23,7 @@ export default function Explore({ navigation }) {
   ];
 
   const categories = ['Category 1', 'Category 2', 'Category 3', 'Category 4'];
-  const categoryColors = ['#DCE9F9', '#CFF9D9', '#F9ECD7', '#FAD4D8'];
+  const categoryColors = ['#5D92B1', '#99D9CA', '#A5BEDC', '#ECCE9B'];
 
   return (
     <View style={styles.container}>
@@ -146,7 +146,8 @@ const styles = StyleSheet.create({
   categoryText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#000',
+    opacity: .9,
   },
   imageSection: {
     marginVertical: 15,
