@@ -10,7 +10,7 @@ export default function Form({ navigation }) {
   return (
     <View style={styles.container}>
       {/* Background image */}
-      <Image source={require('./assets/logo.jpg')} style={styles.backgroundImage} />
+      <Image source={require('./assets/images/logo.jpg')} style={styles.backgroundImage} />
 
       {/* Form content */}
       <View style={styles.content}>

@@ -34,7 +34,7 @@ export default function Reason({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Image source={require('./assets/logo_half.png')} style={styles.backgroundImage} />
+      <Image source={require('./assets/images/logo.jpg')} style={styles.backgroundImage} />
 
       {/* Content View */}
       <View style={styles.content}>

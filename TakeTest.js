@@ -96,16 +96,16 @@ export default function TakeTest({ navigation }) {
         {/* Bottom Navigation */}
         <View style={styles.navbar}>
             <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('HomePlan')}>
-            <Image source={require('./assets/home.png')} style={styles.navIcon} />
+            <Image source={require('./assets/images/home.png')} style={styles.navIcon} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Explore')}>
-            <Image source={require('./assets/search.png')} style={styles.navIcon} />
+            <Image source={require('./assets/images/search.png')} style={styles.navIcon} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Chat')}>
-            <Image source={require('./assets/chat.png')} style={styles.navIcon} />
+            <Image source={require('./assets/images/chat.png')} style={styles.navIcon} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Profile')}>
-            <Image source={require('./assets/profile_choose.png')} style={styles.navIcon} />
+            <Image source={require('./assets/images/profile_choose.png')} style={styles.navIcon} />
             </TouchableOpacity>
         </View>
     </View>

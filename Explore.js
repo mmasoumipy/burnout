@@ -62,7 +62,7 @@ export default function Explore({ navigation }) {
           {/* Image-Based Sections */}
           <TouchableOpacity style={styles.imageSection}>
             <ImageBackground
-              source={require('./assets/cat_season.png')} 
+              source={require('./assets/images/cat_season.png')} 
               style={styles.imageBackground}
               imageStyle={{ borderRadius: 15 }}
             >
@@ -72,7 +72,7 @@ export default function Explore({ navigation }) {
 
           <TouchableOpacity style={styles.imageSection}>
             <ImageBackground
-              source={require('./assets/cat_audio.png')}
+              source={require('./assets/images/cat_audio.png')}
               style={styles.imageBackground}
               imageStyle={{ borderRadius: 15 }} 
             >
@@ -85,16 +85,16 @@ export default function Explore({ navigation }) {
       {/* Bottom Navigation */}
       <View style={styles.navbar}>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('HomePlan')}>
-          <Image source={require('./assets/home.png')} style={styles.navIcon} />
+          <Image source={require('./assets/images/home.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Explore')}>
-          <Image source={require('./assets/search_choose.png')} style={styles.navIcon} />
+          <Image source={require('./assets/images/search_choose.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Chat')}>
-          <Image source={require('./assets/chat.png')} style={styles.navIcon} />
+          <Image source={require('./assets/images/chat.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Profile')}>
-          <Image source={require('./assets/profile.png')} style={styles.navIcon} />
+          <Image source={require('./assets/images/profile.png')} style={styles.navIcon} />
         </TouchableOpacity>
       </View>
     </View>

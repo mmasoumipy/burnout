@@ -7,11 +7,11 @@ export default function HomePlan({ navigation }) {
     const [selectedMood, setSelectedMood] = useState(null);
 
     const moods = [
-        { id: 'frustrated', label: 'Frustrated', image: require('./assets/frustrated.png') },
-        { id: 'sad', label: 'Sad', image: require('./assets/downcast.png') },
-        { id: 'calm', label: 'Calm', image: require('./assets/calm.png') },
-        { id: 'happy', label: 'Happy', image: require('./assets/happy.png') },
-        { id: 'excited', label: 'Excited', image: require('./assets/excited.png') },
+        { id: 'frustrated', label: 'Frustrated', image: require('./assets/images/frustrated.png') },
+        { id: 'sad', label: 'Sad', image: require('./assets/images/downcast.png') },
+        { id: 'calm', label: 'Calm', image: require('./assets/images/calm.png') },
+        { id: 'happy', label: 'Happy', image: require('./assets/images/happy.png') },
+        { id: 'excited', label: 'Excited', image: require('./assets/images/excited.png') },
     ];
 
     const handleMoodClick = (mood) => {
@@ -20,11 +20,11 @@ export default function HomePlan({ navigation }) {
     };
 
     const courses = [
-        { title: 'Morning Course 1', subtitle: 'Video/ Text/ Audio Time', image: require('./assets/morning1.png') },
-        { title: 'Morning Course 2', subtitle: 'Video/ Text/ Audio Time', image: require('./assets/morning2.png') },
-        { title: 'Morning Course 3', subtitle: 'Video/ Text/ Audio Time', image: require('./assets/morning3.png') },
-        { title: 'Afternoon Course', subtitle: 'Video/ Text/ Audio Time', image: require('./assets/afternoon.png') },
-        { title: 'Night Course', subtitle: 'Video/ Text/ Audio Time', image: require('./assets/night.png') },
+        { title: 'Morning Course 1', subtitle: 'Video/ Text/ Audio Time', image: require('./assets/images/morning1.png') },
+        { title: 'Morning Course 2', subtitle: 'Video/ Text/ Audio Time', image: require('./assets/images/morning2.png') },
+        { title: 'Morning Course 3', subtitle: 'Video/ Text/ Audio Time', image: require('./assets/images/morning3.png') },
+        { title: 'Afternoon Course', subtitle: 'Video/ Text/ Audio Time', image: require('./assets/images/afternoon.png') },
+        { title: 'Night Course', subtitle: 'Video/ Text/ Audio Time', image: require('./assets/images/night.png') },
     ];
 
     const handleCourseClick = (course) => {
@@ -111,16 +111,16 @@ export default function HomePlan({ navigation }) {
             {/* Bottom Navigation */}
             <View style={styles.navbar}>
             <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('HomePlan')}  >
-                <Image source={require('./assets/home_choose.png')} style={styles.navIcon}/>
+                <Image source={require('./assets/images/home_choose.png')} style={styles.navIcon}/>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Explore')} >
-                <Image source={require('./assets/search.png')} style={styles.navIcon}  />
+                <Image source={require('./assets/images/search.png')} style={styles.navIcon}  />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Chat')}>
-                <Image source={require('./assets/chat.png')} style={styles.navIcon}  />
+                <Image source={require('./assets/images/chat.png')} style={styles.navIcon}  />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Profile')}  >
-                <Image source={require('./assets/profile.png')} style={styles.navIcon} />
+                <Image source={require('./assets/images/profile.png')} style={styles.navIcon} />
                 </TouchableOpacity>
             </View>
 

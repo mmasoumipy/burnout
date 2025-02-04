@@ -9,7 +9,7 @@ export default function Welcome({ navigation }){
     <View style={styles.container}>
       {/* Full image at the top */}
       <View style={styles.imageContainer}>
-        <Image source={require('./assets/logo_half.png')} style={styles.logo} />
+        <Image source={require('./assets/images/logo_half.png')} style={styles.logo} />
       </View>
 
       {/* Text content */}

@@ -15,7 +15,7 @@ export default function Profile({ navigation }) {
   const moods = [0, 2, 3, 4, 3, ]; // Mood data for the chart
   const streakData = { current: 3, longest: 12 }; // Dummy streaks
   const testResult = 'Your recent test results will be displayed here.'; // Dummy test result
-  const userProfileImage = require('./assets/user_avatar.png'); // Replace with actual image path
+  const userProfileImage = require('./assets/images/user_avatar.png'); // Replace with actual image path
   const moodColors = ['#F9B9C3', '#F9D99B', '#D6C8F0', '#99C7F9', '#ADF5CE']; // Mood colors
 
   const [selectedTab, setSelectedTab] = useState('Mood Tracker'); // Tab state
@@ -24,17 +24,17 @@ export default function Profile({ navigation }) {
 <View style={styles.container}>
     {/* Logo Background */}
     <View style={styles.logoBackground}>
-        <Image source={require('./assets/logo_half.png')} style={styles.logo} />
+        <Image source={require('./assets/images/logo_half.png')} style={styles.logo} />
 
         {/* Header (Icons and User Info) */}
         <View style={styles.header}>
         <View >
             <TouchableOpacity onPress={() => navigation.navigate('TakeTest')} style={styles.iconCircle}>
-                <Image source={require('./assets/test_icon.png')} style={styles.icon} />
+                <Image source={require('./assets/images/test_icon.png')} style={styles.icon} />
             </TouchableOpacity>
         </View>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.iconCircle}>
-            <Image source={require('./assets/setting_icon.png')} style={styles.icon} />
+            <Image source={require('./assets/images/setting_icon.png')} style={styles.icon} />
         </TouchableOpacity>
         </View>
 
@@ -124,16 +124,16 @@ export default function Profile({ navigation }) {
     {/* Bottom Navigation */}
     <View style={styles.navbar}>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('HomePlan')}>
-        <Image source={require('./assets/home.png')} style={styles.navIcon} />
+        <Image source={require('./assets/images/home.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Explore')}>
-        <Image source={require('./assets/search.png')} style={styles.navIcon} />
+        <Image source={require('./assets/images/search.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Chat')}>
-        <Image source={require('./assets/chat.png')} style={styles.navIcon} />
+        <Image source={require('./assets/images/chat.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Profile')}>
-        <Image source={require('./assets/profile_choose.png')} style={styles.navIcon} />
+        <Image source={require('./assets/images/profile_choose.png')} style={styles.navIcon} />
         </TouchableOpacity>
     </View>
 </View>
