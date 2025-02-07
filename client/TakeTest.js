@@ -1,40 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   View,
   Text,
   ScrollView,
   TouchableOpacity,
-  Image,
+  Alert,
 } from 'react-native';
-
-const questions = [
-  {
-    category: 'Emotional Exhaustion (EE)',
-    items: [
-      'I feel emotionally drained from my work.',
-      'I feel used up at the end of the workday.',
-      'I feel fatigued when I get up in the morning and have to face another day on the job.',
-      'I can easily understand how my recipients feel about things.',
-    ],
-  },
-  {
-    category: 'Depersonalization (DP)',
-    items: [
-      'I feel I treat some recipients as if they were impersonal objects.',
-      'Working with people all day is really a strain for me.',
-      'I deal very effectively with the problems of my recipients.',
-    ],
-  },
-  {
-    category: 'Denationalization (DN)',
-    items: [
-      'I feel burned out from my work.',
-      "I feel I'm positively influencing other people's lives through my work.",
-      "I've become more callous toward people since I took this job.",
-    ],
-  },
-];
+import { getTestQuestions, submitTest } from './api';
 
 const options = [
   'Never',
@@ -46,147 +19,136 @@ const options = [
   'Every day',
 ];
 
-export default function TakeTest({ navigation }) {
-  const [responses, setResponses] = useState({}); // Tracks user responses
+const TakeTest = ({ navigation }) => {
+  const [questions, setQuestions] = useState([]);
+  const [responses, setResponses] = useState({});
 
-  const handleSelect = (questionIndex, optionIndex) => {
-    setResponses((prev) => ({
-      ...prev,
-      [questionIndex]: optionIndex,
+  useEffect(() => {
+    async function fetchQuestions() {
+      const data = await getTestQuestions();
+      setQuestions(data);
+    }
+    fetchQuestions();
+  }, []);
+
+  const handleSelect = (questionId, score) => {
+    setResponses((prev) => ({ ...prev, [questionId]: score }));
+  };
+
+  const handleSubmit = async () => {
+    const formattedResponses = Object.keys(responses).map((id) => ({
+      question_id: parseInt(id),
+      score: responses[id],
     }));
+
+    try {
+      const response = await submitTest("123", formattedResponses);
+      if (response) {
+        Alert.alert('Test Result', `Burnout Level: ${response.burnout_level} \n
+          Emotional Exhaustion: ${response.emotional_exhaustion_score} \n
+          Depersonalization: ${response.depersonalization_score} \n
+          Personal Accomplishment: ${response.personal_accomplishment_score}
+          `);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to submit the test. Please try again.');
+    }
   };
 
   return (
     <View style={styles.container}>
-        <ScrollView style={styles.content}>
-        {questions.map((section, sectionIndex) => (
-            <View key={sectionIndex} style={styles.section}>
-            <Text style={styles.category}>{section.category}</Text>
-            {section.items.map((question, questionIndex) => {
-                const globalIndex = `${sectionIndex}-${questionIndex}`; // Unique key
-                return (
-                <View key={globalIndex} style={styles.questionContainer}>
-                    <Text style={styles.question}>{question}</Text>
-                    {options.map((option, optionIndex) => (
-                    <TouchableOpacity
-                        key={optionIndex}
-                        style={styles.optionContainer}
-                        onPress={() => handleSelect(globalIndex, optionIndex)}
-                    >
-                        <View
-                        style={[
-                            styles.radioButton,
-                            responses[globalIndex] === optionIndex && styles.selectedRadio,
-                        ]}
-                        />
-                        <Text style={styles.optionText}>{option}</Text>
-                    </TouchableOpacity>
-                    ))}
-                </View>
-                );
-            })}
-            </View>
+      <ScrollView style={styles.content}>
+        <Text style={styles.header}>Maslach Burnout Inventory (MBI)</Text>
+        {questions.map((question, index) => (
+          <View key={index} style={styles.questionContainer}>
+            <Text style={styles.question}>{question.text}</Text>
+            {options.map((option, optionIndex) => (
+              <TouchableOpacity
+                key={optionIndex}
+                style={styles.optionContainer}
+                onPress={() => handleSelect(question.id, optionIndex)}
+              >
+                <View
+                  style={[
+                    styles.radioButton,
+                    responses[question.id] === optionIndex && styles.selectedRadio,
+                  ]}
+                />
+                <Text style={styles.optionText}>{option}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         ))}
-        <TouchableOpacity style={styles.submitButton}>
-            <Text style={styles.submitText}>Submit</Text>
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitText}>Submit</Text>
         </TouchableOpacity>
-        </ScrollView>
-
-
-        {/* Bottom Navigation */}
-        <View style={styles.navbar}>
-            <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('HomePlan')}>
-            <Image source={require('./assets/images/home.png')} style={styles.navIcon} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Explore')}>
-            <Image source={require('./assets/images/search.png')} style={styles.navIcon} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Chat')}>
-            <Image source={require('./assets/images/chat.png')} style={styles.navIcon} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Profile')}>
-            <Image source={require('./assets/images/profile_choose.png')} style={styles.navIcon} />
-            </TouchableOpacity>
-        </View>
+      </ScrollView>
     </View>
-
   );
-}
+};
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    content: {
-        flex: 1,
-        padding: 24,
-        marginTop: 32,
-        backgroundColor: '#FAF9F6',
-    },
-    section: {
-        marginBottom: 20,
-    },
-    category: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        color: '#333',
-    },
-    questionContainer: {
-        backgroundColor: '#5D92B1',
-        borderRadius: 10,
-        padding: 15,
-        marginBottom: 15,
-    },
-    question: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        color: '#000000',
-    },
-    optionContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-    radioButton: {
-        width: 20,
-        height: 20,
-        borderRadius: 10,
-        borderWidth: 2,
-        borderColor: '#D9D9D9',
-        marginRight: 10,
-    },
-    selectedRadio: {
-        backgroundColor: '#F5A623',
-    },
-    optionText: {
-        fontSize: 14,
-        color: '#000',
-    },
-    submitButton: {
-        backgroundColor: '#007AFF',
-        borderRadius: 10,
-        paddingVertical: 15,
-        alignItems: 'center',
-        marginTop: 20,
-    },
-    submitText: {
-        color: '#FFF',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    navbar: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        padding: 10,
-        backgroundColor: '#E0E0E0',
-      },
-      navItem: {
-        padding: 10,
-      },
-      navIcon: {
-        width: 30,
-        height: 30,
-      },
+  container: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    padding: 24,
+    marginTop: 64,
+    marginBottom: 64,
+    backgroundColor: '#FAF9F6',
+  },
+  header: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#333',
+  },
+  questionContainer: {
+    backgroundColor: '#5D92B1',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+  },
+  question: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#000000',
+  },
+  optionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  radioButton: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#D9D9D9',
+    marginRight: 10,
+  },
+  selectedRadio: {
+    backgroundColor: '#F5A623',
+  },
+  optionText: {
+    fontSize: 14,
+    color: '#000',
+  },
+  submitButton: {
+    backgroundColor: '#007AFF',
+    borderRadius: 10,
+    paddingVertical: 15,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  submitText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
+
+export default TakeTest;
