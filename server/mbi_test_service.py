@@ -54,7 +54,31 @@ def submit_test(submission: TestSubmission):
         else:
             raise HTTPException(status_code=400, detail="Invalid question ID")
 
-    # Determine burnout level based on scores (these thresholds are approximate)
+    emotional_exhaustion_score = categories["emotional_exhaustion"]
+    depersonalization_score = categories["depersonalization"]
+    personal_accomplishment_score = categories["personal_accomplishment"]
+
+    emotional_exhaustion_level = "Low"
+    if emotional_exhaustion_score > 18 and emotional_exhaustion_score <= 33:
+        emotional_exhaustion_level = "Moderate"
+    elif emotional_exhaustion_score > 33:
+        emotional_exhaustion_level = "High"
+
+    depersonalization_level = "Low"
+    if depersonalization_score > 5 and depersonalization_score <= 11:
+        depersonalization_level = "Moderate"
+    elif depersonalization_score > 11:
+        depersonalization_level = "High"
+
+    personal_accomplishment_level = "Low"
+    if personal_accomplishment_score > 31 and personal_accomplishment_score <= 39:
+        personal_accomplishment_level = "Moderate"
+    elif personal_accomplishment_score > 39:
+        personal_accomplishment_level = "High"
+
+
+    # Determine burnout level based on scores 
+    # TODO: These thresholds are approximate, may need to be adjusted
     burnout_level = "Low"
     if categories["emotional_exhaustion"] > 26 or categories["depersonalization"] > 12:
         burnout_level = "High"
@@ -63,6 +87,12 @@ def submit_test(submission: TestSubmission):
 
     return {
         "user_id": submission.user_id,
+        "emotional_exhaustion_score": emotional_exhaustion_score,
+        "depersonalization_score": depersonalization_score,
+        "personal_accomplishment_score": personal_accomplishment_score,
+        "emotional_exhaustion_level": emotional_exhaustion_level,
+        "depersonalization_level": depersonalization_level,
+        "personal_accomplishment_level": personal_accomplishment_level,
         "burnout_score": categories,
         "burnout_level": burnout_level
     }
