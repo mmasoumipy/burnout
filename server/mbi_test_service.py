@@ -1,7 +1,12 @@
 from typing import List
 
-from fastapi import FastAPI, HTTPException
+from database import engine, get_db
+from fastapi import Depends, FastAPI, HTTPException
+from models import Base, Response, Test, User
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -30,69 +35,79 @@ MBI_QUESTIONS = [
     {"id": 22, "text": "I feel patients blame me for some of their problems.", "category": "depersonalization"},
 ]
 
-class Response(BaseModel):
+class ResponseSchema(BaseModel):
     question_id: int
     score: int
 
 class TestSubmission(BaseModel):
-    user_id: str
-    responses: List[Response]
+    user_id: int
+    responses: List[ResponseSchema]
 
 @app.get("/test")
 def get_test():
     return {"questions": MBI_QUESTIONS}
 
 @app.post("/submit")
-def submit_test(submission: TestSubmission):
+def submit_test(submission: TestSubmission, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == submission.user_id).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="User does not exist")
+
     categories = {"emotional_exhaustion": 0, "depersonalization": 0, "personal_accomplishment": 0}
 
-    # Categorizing responses
     for response in submission.responses:
+        # Categorizing responses
         question = next((q for q in MBI_QUESTIONS if q["id"] == response.question_id), None)
         if question:
             categories[question["category"]] += response.score
         else:
             raise HTTPException(status_code=400, detail="Invalid question ID")
 
+    # Determine burnout level
     emotional_exhaustion_score = categories["emotional_exhaustion"]
     depersonalization_score = categories["depersonalization"]
     personal_accomplishment_score = categories["personal_accomplishment"]
 
-    emotional_exhaustion_level = "Low"
-    if emotional_exhaustion_score > 18 and emotional_exhaustion_score <= 33:
-        emotional_exhaustion_level = "Moderate"
-    elif emotional_exhaustion_score > 33:
-        emotional_exhaustion_level = "High"
+    emotional_exhaustion_level = "Low" if emotional_exhaustion_score <= 18 else "Moderate" if emotional_exhaustion_score <= 33 else "High"
+    depersonalization_level = "Low" if depersonalization_score <= 5 else "Moderate" if depersonalization_score <= 11 else "High"
+    personal_accomplishment_level = "High" if personal_accomplishment_score >= 40 else "Moderate" if personal_accomplishment_score >= 31 else "Low"
 
-    depersonalization_level = "Low"
-    if depersonalization_score > 5 and depersonalization_score <= 11:
-        depersonalization_level = "Moderate"
-    elif depersonalization_score > 11:
-        depersonalization_level = "High"
-
-    personal_accomplishment_level = "Low"
-    if personal_accomplishment_score > 31 and personal_accomplishment_score <= 39:
-        personal_accomplishment_level = "Moderate"
-    elif personal_accomplishment_score > 39:
-        personal_accomplishment_level = "High"
-
-
-    # Determine burnout level based on scores 
-    # TODO: These thresholds are approximate, may need to be adjusted
     burnout_level = "Low"
-    if categories["emotional_exhaustion"] > 26 or categories["depersonalization"] > 12:
+    if emotional_exhaustion_score > 26 or depersonalization_score > 12:
         burnout_level = "High"
-    elif categories["emotional_exhaustion"] > 18 or categories["depersonalization"] > 9:
+    elif emotional_exhaustion_score > 18 or depersonalization_score > 9:
         burnout_level = "Moderate"
+
+    # Store in DB
+    test_entry = Test(
+        user_id=submission.user_id,
+        emotional_exhaustion_score=emotional_exhaustion_score,
+        depersonalization_score=depersonalization_score,
+        personal_accomplishment_score=personal_accomplishment_score,
+        emotional_exhaustion_level=emotional_exhaustion_level,
+        depersonalization_level=depersonalization_level,
+        personal_accomplishment_level=personal_accomplishment_level,
+        burnout_level=burnout_level
+    )
+    db.add(test_entry)
+    db.commit()
+    db.refresh(test_entry)
+
+    # Store responses
+    for response in submission.responses:
+        response_entry = Response(test_id=test_entry.id, question_id=response.question_id, score=response.score)
+        db.add(response_entry)
+
+    db.commit()
 
     return {
         "user_id": submission.user_id,
+        "test_id": test_entry.id,
         "emotional_exhaustion_score": emotional_exhaustion_score,
         "depersonalization_score": depersonalization_score,
         "personal_accomplishment_score": personal_accomplishment_score,
         "emotional_exhaustion_level": emotional_exhaustion_level,
         "depersonalization_level": depersonalization_level,
         "personal_accomplishment_level": personal_accomplishment_level,
-        "burnout_score": categories,
         "burnout_level": burnout_level
     }

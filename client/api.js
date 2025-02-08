@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://127.0.0.1:8000';
+const BASE_URL = 'http://localhost:8000';
 
 // Fetch MBI Test Questions
 export const getTestQuestions = async () => {
@@ -17,7 +17,7 @@ export const getTestQuestions = async () => {
 export const submitTest = async (userId, responses) => {
   try {
     const response = await axios.post(`${BASE_URL}/submit`, {
-      user_id: userId,
+      user_id: 1,
       responses: responses
     });
     return response.data;
