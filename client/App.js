@@ -13,6 +13,7 @@ import Explore from './Explore';
 import Chat from './Chat';
 import Profile from './Profile';
 import TakeTest from './TakeTest';
+import Register from './Register';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -32,6 +33,8 @@ export default function App() {
         <Stack.Screen name="Chat" component={Chat} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="TakeTest" component={TakeTest} />
+        <Stack.Screen name="Register" component={Register} />
+
 
       </Stack.Navigator>
     </NavigationContainer>

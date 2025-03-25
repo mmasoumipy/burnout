@@ -33,13 +33,14 @@ export default function Welcome({ navigation }){
       </View>
 
       {/* Buttons */}
-      <TouchableOpacity style={styles.createAccountButton}>
+      <TouchableOpacity style={styles.createAccountButton} onPress={() => navigation.navigate('Register')}>
         <Text style={styles.buttonText}>Create an account</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('Form')}>
         <Text style={styles.buttonText}>Log in</Text>
       </TouchableOpacity>
+      
     </View>
   );
 }
