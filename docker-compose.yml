@@ -22,7 +22,7 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: "postgresql://myuser:mypassword@db:5432/burnout_db"
+      DATABASE_URL: postgresql://myuser:mypassword@db:5432/burnout_db
     ports:
       - "8000:8000"
     volumes:
@@ -32,5 +32,3 @@ services:
 
 volumes:
   postgres_data:
-
-    
