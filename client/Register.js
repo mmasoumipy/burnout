@@ -4,9 +4,11 @@ import {
   KeyboardAvoidingView, Platform, Image
 } from 'react-native';
 import { registerUser } from './api';
+import { SensorType } from 'react-native-reanimated';
 
 export default function Register({ navigation }) {
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -23,12 +25,14 @@ export default function Register({ navigation }) {
     }
 
     try {
-      const res = await registerUser(email, password);
+      const res = await registerUser(name, email, password);
       alert(res.data.message);
-      navigation.navigate('Login');
+      navigation.navigate('Welcome');
     } catch (err) {
-      alert(err.response?.data?.detail || "Registration failed");
-    }
+        console.log('Registration error:', err);
+        alert(err.response?.data?.detail || "Registration failed");
+      }
+      
   };
 
   const handleGoogleRegister = () => {
@@ -44,6 +48,17 @@ export default function Register({ navigation }) {
       <Text style={styles.subtitle}>Create an account to get started</Text>
 
       <View style={styles.form}>
+
+      <TextInput
+          placeholder="Your Name"
+          placeholderTextColor="#999"
+          value={name}
+          onChangeText={setName}
+          style={styles.input}
+          keyboardType="default"
+          autoCapitalize="none"
+        />
+
         <TextInput
           placeholder="Email"
           placeholderTextColor="#999"
@@ -79,14 +94,16 @@ export default function Register({ navigation }) {
         <Text style={styles.orText}>or</Text>
 
         <TouchableOpacity style={styles.googleButton} onPress={handleGoogleRegister}>
-          <Image
-            source={require('./assets/images/google.png')}
-            style={styles.googleIcon}
-          />
-          <Text style={styles.googleText}>Register with Google</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Image
+                source={require('./assets/images/google.png')}
+                style={styles.googleIcon}
+                />
+                <Text style={styles.googleText}>Register with Google</Text>
+            </View>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Welcome')}>
           <Text style={styles.loginLink}>Already have an account? Log in</Text>
         </TouchableOpacity>
       </View>

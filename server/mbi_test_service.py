@@ -8,12 +8,13 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from auth import router as auth_router
-app.include_router(auth_router)
 
 # Base.metadata.create_all(bind=engine)
 create_tables()
 
 app = FastAPI()
+
+app.include_router(auth_router)
 
 MBI_QUESTIONS = [
     {"id": 1, "text": "I feel emotionally drained from my work.", "category": "emotional_exhaustion"},

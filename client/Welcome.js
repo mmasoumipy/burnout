@@ -1,9 +1,26 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, Switch, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Switch, Dimensions, TextInput } from 'react-native';
 
-
-export default function Welcome({ navigation }){
+export default function Welcome({ navigation }) {
   const [isChecked, setIsChecked] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  
+  const handleLogin = async () => {
+    if (!email || !password) {
+      alert('Please enter both email and password.');
+      return;
+    }
+  
+    try {
+      const res = await loginUser(email, password);
+      alert("Login successful");
+      navigation.navigate('Form');
+    } catch (err) {
+      alert(err.response?.data?.detail || "Login failed");
+    }
+  };
+  
 
   return (
     <View style={styles.container}>
@@ -15,13 +32,14 @@ export default function Welcome({ navigation }){
       {/* Text content */}
       <View style={styles.textContainer}>
         <Text style={styles.title}>Welcome</Text>
-        <Text style={styles.appName}>APP NAME</Text>
+        <Text style={styles.appName}>WellMed</Text>
         <Text style={styles.description}>
           A very short explanation of the goal of the application
         </Text>
       </View>
 
       {/* Terms and conditions */}
+      {/* Switch component to toggle the terms and conditions 
       <View style={styles.termsContainer}>
         <Switch
           value={isChecked}
@@ -31,16 +49,38 @@ export default function Welcome({ navigation }){
         />
         <Text style={styles.termsText}>Terms And Conditions</Text>
       </View>
+      */}
+
+      {/* Login Inputs */}
+      <View style={styles.loginFields}>
+        <TextInput
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          style={styles.input}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          placeholderTextColor="#999"
+        />
+        <TextInput
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          style={styles.input}
+          secureTextEntry
+          placeholderTextColor="#999"
+        />
+      </View>
 
       {/* Buttons */}
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>      
+        <Text style={styles.buttonText}>Log in</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.createAccountButton} onPress={() => navigation.navigate('Register')}>
         <Text style={styles.buttonText}>Create an account</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('Form')}>
-        <Text style={styles.buttonText}>Log in</Text>
-      </TouchableOpacity>
-      
     </View>
   );
 }
@@ -49,21 +89,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FAF9F6',
-    justifyContent: 'space-between',
+    alignItems: 'center',
   },
+  
   imageContainer: {
     width: '100%',
     alignItems: 'flex-start',
-    height: Dimensions.get('window').width/2,
+    height: Dimensions.get('window').width / 2,
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FAF9F6', 
+    backgroundColor: '#FAF9F6',
   },
   logo: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover', 
+    resizeMode: 'cover',
   },
   textContainer: {
     marginTop: 20,
@@ -105,6 +146,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'center',
     marginVertical: 1,
+    marginTop: 20,           // added
   },
   loginButton: {
     backgroundColor: '#E0E0E0',
@@ -114,10 +156,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'center',
     marginVertical: 10,
+    marginTop: 10,           // added
+    marginBottom: 20,        // added
   },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  loginFields: {
+    width: '70%',
+    marginTop: 20,
+  },
+  input: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#CCCCCC',
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    fontSize: 14,
+    marginBottom: 10,
   },
 });

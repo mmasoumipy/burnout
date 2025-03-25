@@ -8,6 +8,7 @@ from utils import hash_password, verify_password
 router = APIRouter()
 
 class RegisterRequest(BaseModel):
+    name: str
     email: str
     password: str
 
@@ -16,7 +17,7 @@ def register(user: RegisterRequest, db: Session = Depends(get_db)):
     if db.query(User).filter(User.email == user.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    new_user = User(email=user.email, password_hash=hash_password(user.password))
+    new_user = User(name=user.name, email=user.email, password=hash_password(user.password))
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -29,7 +30,7 @@ class LoginRequest(BaseModel):
 @router.post("/login")
 def login(user: LoginRequest, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.email == user.email).first()
-    if not db_user or not verify_password(user.password, db_user.password_hash):
+    if not db_user or not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     return {"message": "Login successful", "user_id": db_user.id}

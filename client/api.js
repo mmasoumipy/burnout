@@ -3,13 +3,14 @@ import axios from 'axios';
 const BASE_URL = 'http://localhost:8000';
 
 // Register User
-export const registerUser = async (email, password) => {
-  return axios.post(`${API_URL}/register`, { email, password });
+export const registerUser = async (name, email, password) => {
+  return axios.post(`${BASE_URL}/register`, { name, email, password });
 };
 
+
 // Login User
-export const loginUser = async (email, password) => {
-  return axios.post(`${API_URL}/login`, { email, password });
+export const loginUser = async (name, email, password) => {
+  return axios.post(`${BASE_URL}/login`, { name, email, password });
 };
 
 // Fetch MBI Test Questions
