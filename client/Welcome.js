@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, Switch, Dimensions, TextInput } from 'react-native';
+import { loginUser } from './api';
 
 export default function Welcome({ navigation }) {
   const [isChecked, setIsChecked] = useState(false);
@@ -13,13 +14,15 @@ export default function Welcome({ navigation }) {
     }
   
     try {
+      console.log("Sending to API:", { email, password }); // 👈 add this
       const res = await loginUser(email, password);
       alert("Login successful");
       navigation.navigate('Form');
     } catch (err) {
+      console.log("Login error:", err.response?.data);
       alert(err.response?.data?.detail || "Login failed");
     }
-  };
+  };  
   
 
   return (

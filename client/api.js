@@ -9,8 +9,8 @@ export const registerUser = async (name, email, password) => {
 
 
 // Login User
-export const loginUser = async (name, email, password) => {
-  return axios.post(`${BASE_URL}/login`, { name, email, password });
+export const loginUser = async (email, password) => {
+  return axios.post(`${BASE_URL}/login`, { email, password });
 };
 
 // Fetch MBI Test Questions
@@ -28,7 +28,7 @@ export const getTestQuestions = async () => {
 export const submitTest = async (userId, responses) => {
   try {
     const response = await axios.post(`${BASE_URL}/submit`, {
-      user_id: 1,
+      user_id: userId,
       responses: responses
     });
     return response.data;

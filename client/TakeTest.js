@@ -41,8 +41,9 @@ const TakeTest = ({ navigation }) => {
       score: responses[id],
     }));
 
+    // TODO: Update the user ID -->  Session or Auth
     try {
-      const response = await submitTest("123", formattedResponses);
+      const response = await submitTest("2", formattedResponses);
       if (response) {
         Alert.alert('Test Result', `Burnout Level: ${response.burnout_level} \n
           Emotional Exhaustion: ${response.emotional_exhaustion_score} \n
