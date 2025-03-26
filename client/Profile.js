@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   StyleSheet,
   View,
@@ -9,8 +9,10 @@ import {
   ScrollView,
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
+import { UserContext } from './UserContext';
 
 export default function Profile({ navigation }) {
+  const { user } = useContext(UserContext);
   // Dummy data
   const moods = [0, 2, 3, 4, 3, ]; // Mood data for the chart
   const streakData = { current: 3, longest: 12 }; // Dummy streaks
@@ -41,7 +43,7 @@ export default function Profile({ navigation }) {
         {/* User Info */}
         <View style={styles.userInfo}>
         <Image source={userProfileImage} style={styles.profileImage} />
-        <Text style={styles.userName}>Mina</Text>
+        <Text style={styles.userName}>{user?.name || 'User'}</Text>
         </View>
     </View>
 

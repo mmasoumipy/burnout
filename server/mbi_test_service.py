@@ -2,7 +2,6 @@ from typing import List
 
 from database import engine, get_db
 from fastapi import Depends, FastAPI, HTTPException
-# from models import Base, Response, Test, User
 from models import Response, Test, User, create_tables
 from pydantic import BaseModel
 from sqlalchemy.orm import Session

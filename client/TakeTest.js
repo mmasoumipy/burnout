@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import {
   StyleSheet,
   View,
@@ -8,6 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import { getTestQuestions, submitTest } from './api';
+import { UserContext } from './UserContext';
 
 const options = [
   'Never',
@@ -20,6 +21,7 @@ const options = [
 ];
 
 const TakeTest = ({ navigation }) => {
+  const { user } = useContext(UserContext);
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState({});
 
@@ -36,6 +38,10 @@ const TakeTest = ({ navigation }) => {
   };
 
   const handleSubmit = async () => {
+    if (!user?.id) {
+      Alert.alert("Error", "User not found. Please log in again.");
+      return;
+    }
     const formattedResponses = Object.keys(responses).map((id) => ({
       question_id: parseInt(id),
       score: responses[id],
@@ -43,7 +49,7 @@ const TakeTest = ({ navigation }) => {
 
     // TODO: Update the user ID -->  Session or Auth
     try {
-      const response = await submitTest("2", formattedResponses);
+      const response = await submitTest(user.id, formattedResponses);
       if (response) {
         Alert.alert('Test Result', `Burnout Level: ${response.burnout_level} \n
           Emotional Exhaustion: ${response.emotional_exhaustion_score} \n

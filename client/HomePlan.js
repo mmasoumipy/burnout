@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { UserContext } from './UserContext';
 
 export default function HomePlan({ navigation }) {
-    const [selectedTab, setSelectedTab] = useState('Your Plan'); // Default tab
+    const { user } = useContext(UserContext);
+    const [selectedTab, setSelectedTab] = useState('Your Plan');
 
     const [selectedMood, setSelectedMood] = useState(null);
 
@@ -35,7 +37,8 @@ export default function HomePlan({ navigation }) {
         <View style={styles.container}>
             <View style={styles.content}>
                 <ScrollView>
-                    <Text style={styles.greeting}>Good morning, Mina</Text>
+                    
+                    <Text style={styles.greeting}>Good morning, {user?.name || 'User'}</Text>
                     <Text style={styles.subtitle}>How do you feel today?</Text>
 
                     {/* Emotions Row */}

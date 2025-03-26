@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, Switch, Dimensions, TextInput } from 'react-native';
 import { loginUser } from './api';
+import { UserContext } from './UserContext';
+import { all } from 'axios';
+
 
 export default function Welcome({ navigation }) {
+
+  const { setUser } = useContext(UserContext);
   const [isChecked, setIsChecked] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -14,13 +19,14 @@ export default function Welcome({ navigation }) {
     }
   
     try {
-      console.log("Sending to API:", { email, password }); // 👈 add this
+      console.log("Sending to API:", { email, password }); 
       const res = await loginUser(email, password);
       alert("Login successful");
+      setUser(res.data.user);
       navigation.navigate('Form');
     } catch (err) {
-      console.log("Login error:", err.response?.data);
-      alert(err.response?.data?.detail || "Login failed");
+      console.log("Login error:", err?.response?.data || err.message);
+      alert(err?.response?.data?.detail || "Login failed");
     }
   };  
   

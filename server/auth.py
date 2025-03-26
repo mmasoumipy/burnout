@@ -33,4 +33,11 @@ def login(user: LoginRequest, db: Session = Depends(get_db)):
     if not db_user or not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    return {"message": "Login successful", "user_id": db_user.id}
+    return {
+        "message": "Login successful", 
+            "user": {
+                "id": db_user.id, 
+                "name": db_user.name, 
+                "email": db_user.email
+                }
+            }
