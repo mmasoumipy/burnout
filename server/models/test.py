@@ -8,7 +8,7 @@ class Test(Base):
     __tablename__ = "tests"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    timestamp = Column(DateTime, default=func.now())
+    created_at = Column(DateTime, default=func.now())
     emotional_exhaustion_score = Column(Integer)
     depersonalization_score = Column(Integer)
     personal_accomplishment_score = Column(Integer)

@@ -10,17 +10,35 @@ import {
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { UserContext } from './UserContext';
+import{ getTestResults } from './api';
 
 export default function Profile({ navigation }) {
   const { user } = useContext(UserContext);
   // Dummy data
+  
   const moods = [0, 2, 3, 4, 3, ]; // Mood data for the chart
   const streakData = { current: 3, longest: 12 }; // Dummy streaks
-  const testResult = 'Your recent test results will be displayed here.'; // Dummy test result
+  
   const userProfileImage = require('./assets/images/user_avatar.png'); // Replace with actual image path
   const moodColors = ['#F9B9C3', '#F9D99B', '#D6C8F0', '#99C7F9', '#ADF5CE']; // Mood colors
 
+  const [testResults, setTestResults] = useState([]);
+  const [loadingResults, setLoadingResults] = useState(false);
+
   const [selectedTab, setSelectedTab] = useState('Mood Tracker'); // Tab state
+
+  const fetchTestResults = async () => {
+    try {
+      setLoadingResults(true);
+      const data = await getTestResults(user.id);
+      setTestResults(data);
+    } catch (error) {
+      console.error('Failed to fetch test results:', error);
+    } finally {
+      setLoadingResults(false);
+    }
+  };
+  
 
   return (
 <View style={styles.container}>
@@ -48,7 +66,7 @@ export default function Profile({ navigation }) {
     </View>
 
     {/* Main Content */}
-    <ScrollView contentContainerStyle={styles.content}>
+     <ScrollView contentContainerStyle={styles.content}> 
         {/* Tabs */}
         <View style={styles.tabs}>
         <TouchableOpacity
@@ -61,7 +79,10 @@ export default function Profile({ navigation }) {
         </TouchableOpacity>
         <TouchableOpacity
             style={[styles.tabButton, selectedTab === 'Test Result' && styles.activeTab]}
-            onPress={() => setSelectedTab('Test Result')}
+            onPress={() => {
+              setSelectedTab('Test Result')
+              fetchTestResults();}
+            }
         >
             <Text style={[styles.tabText, selectedTab === 'Test Result' && styles.activeTabText]}>
             Test Result
@@ -118,9 +139,25 @@ export default function Profile({ navigation }) {
         {/* Test Result */}
         {selectedTab === 'Test Result' && (
         <View style={styles.testResult}>
-            <Text style={styles.testResultText}>{testResult}</Text>
+          {loadingResults ? (
+            <Text style={styles.testResultText}>Loading...</Text>
+          ) : testResults.length === 0 ? (
+            <Text style={styles.testResultText}>You haven't taken any test yet 📝</Text>
+          ) : (
+            testResults.map((result, index) => (
+              <View key={index} style={styles.resultCard}>
+                <Text style={styles.resultDate}>🗓 {new Date(result.created_at).toLocaleDateString()}</Text>
+                <Text>🔥 Emotional Exhaustion: {result.emotional_exhaustion_score} ({result.emotional_exhaustion_level})</Text>
+                <Text>🧊 Depersonalization: {result.depersonalization_score} ({result.depersonalization_level})</Text>
+                <Text>🌟 Personal Accomplishment: {result.personal_accomplishment_score} ({result.personal_accomplishment_level})</Text>
+                <Text style={{ fontWeight: 'bold', marginTop: 5 }}>🧠 Burnout Level: {result.burnout_level}</Text>
+              </View>
+            ))
+          )}
         </View>
-        )}
+      )}
+
+
     </ScrollView>
 
     {/* Bottom Navigation */}
@@ -151,7 +188,6 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
         paddingHorizontal: 24,
-        marginTop: -30,
         justifyContent: 'center', 
     },
     logoBackground: {
@@ -210,6 +246,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'center',
       marginVertical: 10,
+      marginTop: 100,
     },
     tabButton: {
       paddingVertical: 10,
@@ -289,5 +326,31 @@ const styles = StyleSheet.create({
       width: 30,
       height: 30,
     },
+
+    resultCard: {
+      backgroundColor: '#fff',
+      borderRadius: 12,
+      padding: 18,
+      marginBottom: 15,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    
+    resultDate: {
+      fontSize: 14,
+      fontWeight: '600',
+      marginBottom: 8,
+      color: '#333',
+    },
+    
+    resultItem: {
+      fontSize: 15,
+      marginVertical: 2,
+      color: '#444',
+    },
+    
   });
   

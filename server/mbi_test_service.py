@@ -116,3 +116,26 @@ def submit_test(submission: TestSubmission, db: Session = Depends(get_db)):
         "personal_accomplishment_level": personal_accomplishment_level,
         "burnout_level": burnout_level
     }
+
+@app.get("/tests/{user_id}")
+def get_tests_by_user(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    tests = db.query(Test).filter(Test.user_id == user_id).order_by(Test.created_at.desc()).all()
+
+    return [
+        {
+            "id": test.id,
+            "created_at": test.created_at,
+            "emotional_exhaustion_score": test.emotional_exhaustion_score,
+            "emotional_exhaustion_level": test.emotional_exhaustion_level,
+            "depersonalization_score": test.depersonalization_score,
+            "depersonalization_level": test.depersonalization_level,
+            "personal_accomplishment_score": test.personal_accomplishment_score,
+            "personal_accomplishment_level": test.personal_accomplishment_level,
+            "burnout_level": test.burnout_level,
+        }
+        for test in tests
+    ]

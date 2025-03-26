@@ -21,7 +21,6 @@ export default function Welcome({ navigation }) {
     try {
       console.log("Sending to API:", { email, password }); 
       const res = await loginUser(email, password);
-      alert("Login successful");
       setUser(res.data.user);
       navigation.navigate('Form');
     } catch (err) {

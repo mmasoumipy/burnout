@@ -37,3 +37,14 @@ export const submitTest = async (userId, responses) => {
     return null;
   }
 };
+
+// Fetch Test Results by User ID
+export const getTestResults = async (userId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/tests/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching results:", error);
+    return null;
+  }
+};
