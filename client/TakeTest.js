@@ -47,7 +47,7 @@ const TakeTest = ({ navigation }) => {
       score: responses[id],
     }));
 
-    // TODO: Update the user ID -->  Session or Auth
+
     try {
       const response = await submitTest(user.id, formattedResponses);
       if (response) {
@@ -64,6 +64,10 @@ const TakeTest = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Text style={styles.backText}>← Back</Text>
+      </TouchableOpacity>
+
       <ScrollView style={styles.content}>
         <Text style={styles.header}>Maslach Burnout Inventory (MBI)</Text>
         {questions.map((question, index) => (
@@ -156,6 +160,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+
+  backButton: {
+    width: 100,
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    zIndex: 1,
+    backgroundColor: '#E0E0E0',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  backText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  
 });
 
 export default TakeTest;
