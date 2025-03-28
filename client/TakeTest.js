@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { getTestQuestions, submitTest } from './api';
 import { UserContext } from './UserContext';
 
@@ -64,9 +65,9 @@ const TakeTest = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Text style={styles.backText}>← Back</Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Icon name="arrow-back" size={24} color="#000" />
+        </TouchableOpacity>
 
       <ScrollView style={styles.content}>
         <Text style={styles.header}>Maslach Burnout Inventory (MBI)</Text>
@@ -103,11 +104,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    flex: 1,
     padding: 24,
     marginTop: 64,
     marginBottom: 64,
     backgroundColor: '#FAF9F6',
+    position: 'relative',
   },
   header: {
     fontSize: 20,
@@ -162,19 +163,13 @@ const styles = StyleSheet.create({
   },
 
   backButton: {
-    width: 100,
     position: 'absolute',
     top: 40,
     left: 20,
-    zIndex: 1,
     backgroundColor: '#E0E0E0',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-  },
-  backText: {
-    fontSize: 16,
-    color: '#333',
+    borderRadius: 25,
+    padding: 10,
+    opacity: 0.7,
   },
   
 });

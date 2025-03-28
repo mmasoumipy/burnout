@@ -108,7 +108,7 @@ export default function Profile({ navigation }) {
           <TouchableOpacity onPress={() => navigation.navigate('TakeTest')} style={styles.iconCircle}>
             <Image source={require('./assets/images/test_icon.png')} style={styles.icon} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.iconCircle}>
+          <TouchableOpacity onPress={() => navigation.navigate('Setting')} style={styles.iconCircle}>
             <Image source={require('./assets/images/setting_icon.png')} style={styles.icon} />
           </TouchableOpacity>
         </View>
@@ -172,8 +172,6 @@ export default function Profile({ navigation }) {
                 return moodLabels[Math.round(value)] || '';
               }
               }
-
-              withDots={true}
               chartConfig={{
                 backgroundGradientFrom: '#FFF',
                 backgroundGradientTo: '#FFF',

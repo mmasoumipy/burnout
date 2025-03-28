@@ -14,6 +14,7 @@ import Chat from './Chat';
 import Profile from './Profile';
 import TakeTest from './TakeTest';
 import Register from './Register';
+import Setting from './Setting';
 import { UserProvider } from './UserContext';
 
 const Stack = createStackNavigator();
@@ -34,6 +35,7 @@ export default function App() {
           <Stack.Screen name="Profile" component={Profile} />
           <Stack.Screen name="TakeTest" component={TakeTest} />
           <Stack.Screen name="Register" component={Register} />
+          <Stack.Screen name="Setting" component={Setting} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>
