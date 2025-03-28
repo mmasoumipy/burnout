@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -9,23 +9,84 @@ import {
   ScrollView,
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
+import { Circle } from 'react-native-svg';
 import { UserContext } from './UserContext';
-import{ getTestResults } from './api';
+import { getTestResults, getMoodHistory, submitMood } from './api';
 
 export default function Profile({ navigation }) {
   const { user } = useContext(UserContext);
-  // Dummy data
-  
-  const moods = [0, 2, 3, 4, 3, ]; // Mood data for the chart
-  const streakData = { current: 3, longest: 12 }; // Dummy streaks
-  
-  const userProfileImage = require('./assets/images/user_avatar.png'); // Replace with actual image path
-  const moodColors = ['#F9B9C3', '#F9D99B', '#D6C8F0', '#99C7F9', '#ADF5CE']; // Mood colors
 
+  const [selectedMood, setSelectedMood] = useState(null);
+  const [moodHistory, setMoodHistory] = useState([]);
+  const moods = [
+    { id: 'frustrated', label: 'Frustrated', image: require('./assets/images/frustrated.png') },
+    { id: 'sad', label: 'Sad', image: require('./assets/images/downcast.png') },
+    { id: 'calm', label: 'Calm', image: require('./assets/images/calm.png') },
+    { id: 'happy', label: 'Happy', image: require('./assets/images/happy.png') },
+    { id: 'excited', label: 'Excited', image: require('./assets/images/excited.png') },
+  ];
+
+  const moodScale = {
+    frustrated: 1,
+    sad: 2,
+    calm: 3,
+    happy: 4,
+    excited: 5,
+  };
+
+  const moodColors = {
+    frustrated: '#8B0000',
+    sad: '#4B6C8B',
+    calm: '#808080',
+    happy: '#FFD700',
+    excited: '#FF69B4',
+  };
+
+  const handleMoodClick = async (mood) => {
+    setSelectedMood(mood.id);
+    alert(`You selected: ${mood.label}`);
+    try {
+      await submitMood(user.id, mood.id);
+      fetchMoodHistory();
+    } catch (error) {
+      console.error('Error saving mood:', error);
+    }
+  };
+
+  const fetchMoodHistory = async () => {
+    try {
+      const history = await getMoodHistory(user.id);
+      setMoodHistory(history);
+    } catch (err) {
+      console.error("Failed to fetch mood history", err);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedTab === 'Mood Tracker') {
+      fetchMoodHistory();
+    }
+  }, [selectedTab]);
+
+  const moodChartData = {
+    labels: moodHistory.map(entry => {
+      const date = new Date(entry.timestamp);
+      return `${date.getMonth() + 1}/${date.getDate()}`;
+    }),
+    datasets: [
+      {
+        data: moodHistory.map(entry => moodScale[entry.mood] || 0),
+        color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+      },
+    ],
+  };
+
+  const getMoodColor = (moodId) => moodColors[moodId] || '#2C3E50';
+
+  const userProfileImage = require('./assets/images/user_avatar.png');
   const [testResults, setTestResults] = useState([]);
   const [loadingResults, setLoadingResults] = useState(false);
-
-  const [selectedTab, setSelectedTab] = useState('Mood Tracker'); // Tab state
+  const [selectedTab, setSelectedTab] = useState('Mood Tracker');
 
   const fetchTestResults = async () => {
     try {
@@ -38,146 +99,149 @@ export default function Profile({ navigation }) {
       setLoadingResults(false);
     }
   };
-  
 
   return (
-<View style={styles.container}>
-    {/* Logo Background */}
-    <View style={styles.logoBackground}>
+    <View style={styles.container}>
+      <View style={styles.logoBackground}>
         <Image source={require('./assets/images/logo_half.png')} style={styles.logo} />
-
-        {/* Header (Icons and User Info) */}
         <View style={styles.header}>
-        <View >
-            <TouchableOpacity onPress={() => navigation.navigate('TakeTest')} style={styles.iconCircle}>
-                <Image source={require('./assets/images/test_icon.png')} style={styles.icon} />
-            </TouchableOpacity>
-        </View>
-        <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.iconCircle}>
+          <TouchableOpacity onPress={() => navigation.navigate('TakeTest')} style={styles.iconCircle}>
+            <Image source={require('./assets/images/test_icon.png')} style={styles.icon} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.iconCircle}>
             <Image source={require('./assets/images/setting_icon.png')} style={styles.icon} />
-        </TouchableOpacity>
+          </TouchableOpacity>
         </View>
-
-        {/* User Info */}
         <View style={styles.userInfo}>
-        <Image source={userProfileImage} style={styles.profileImage} />
-        <Text style={styles.userName}>{user?.name || 'User'}</Text>
+          <Image source={userProfileImage} style={styles.profileImage} />
+          <Text style={styles.userName}>{user?.name || 'User'}</Text>
         </View>
-    </View>
+      </View>
 
-    {/* Main Content */}
-     <ScrollView contentContainerStyle={styles.content}> 
-        {/* Tabs */}
+      <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.tabs}>
-        <TouchableOpacity
+          <TouchableOpacity
             style={[styles.tabButton, selectedTab === 'Mood Tracker' && styles.activeTab]}
             onPress={() => setSelectedTab('Mood Tracker')}
-        >
-            <Text style={[styles.tabText, selectedTab === 'Mood Tracker' && styles.activeTabText]}>
-            Mood Tracker
-            </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
+          >
+            <Text style={[styles.tabText, selectedTab === 'Mood Tracker' && styles.activeTabText]}>Mood Tracker</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             style={[styles.tabButton, selectedTab === 'Test Result' && styles.activeTab]}
             onPress={() => {
-              setSelectedTab('Test Result')
-              fetchTestResults();}
-            }
-        >
-            <Text style={[styles.tabText, selectedTab === 'Test Result' && styles.activeTabText]}>
-            Test Result
-            </Text>
-        </TouchableOpacity>
+              setSelectedTab('Test Result');
+              fetchTestResults();
+            }}
+          >
+            <Text style={[styles.tabText, selectedTab === 'Test Result' && styles.activeTabText]}>Test Result</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Mood Tracker */}
         {selectedTab === 'Mood Tracker' && (
-        <View>
-            <View style={styles.moodColorsContainer}>
-            {moodColors.map((color, index) => (
-                <View key={index} style={[styles.moodColor, { backgroundColor: color }]} />
-            ))}
+          <View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginBottom: 20 }}>
+              {moods.map((mood) => (
+                <TouchableOpacity
+                  key={mood.id}
+                  style={[styles.moodButton, selectedMood === mood.id && styles.selectedMood]}
+                  onPress={() => handleMoodClick(mood)}
+                >
+                  <Image source={mood.image} style={styles.moodImage} />
+                </TouchableOpacity>
+              ))}
             </View>
-            <LineChart
-            data={{
-                labels: ['D1', 'D2', 'D3', 'D4', 'D5'], // X-axis labels
-                datasets: [{ data: moods }], // Mood data
-            }}
-            width={Dimensions.get('window').width - 40}
-            height={200}
-            yAxisLabel={''}
-            yAxisSuffix={''}
-            fromZero={true}
-            yAxisInterval={1}
-            formatYLabel={(value) => {
-                const moodLabels = ['Frustrated', 'Sad', 'Calm', 'Happy', 'Excited'];
-                return moodLabels[parseInt(value, 10) - 1] || '';
-            }}
-            chartConfig={{
+
+            {moodHistory.length > 0 && (
+              <LineChart
+              data={moodChartData}
+              width={Dimensions.get('window').width - 40}
+              height={220}
+              segments={4} // 5 moods = 4 intervals
+              fromZero={false}
+              withDots={true}
+              withInnerLines={true}
+              yAxisInterval={1}
+              formatYLabel={(value) => {
+                const moodLabels = {
+                  1: 'Frustrated',
+                  2: 'Sad',
+                  3: 'Calm',
+                  4: 'Happy',
+                  5: 'Excited',
+                };
+                return moodLabels[Math.round(value)] || '';
+              }
+              }
+
+              withDots={true}
+              chartConfig={{
                 backgroundGradientFrom: '#FFF',
                 backgroundGradientTo: '#FFF',
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            }}
-            style={styles.chart}
+                decimalPlaces: 0,
+                color: () => '#000',
+                labelColor: () => '#000',
+                propsForBackgroundLines: {
+                  strokeDasharray: '9',
+                  strokeWidth: 0.5,
+                  stroke: '#E0E0E0', 
+                },
+              }}
+              bezier
+              style={styles.chart}
+              getDotProps={(value, index) => {
+                const mood = moodHistory[index]?.mood;
+                const color = moodColors[mood] || '#2C3E50';
+                return {
+                  r: '5',
+                  strokeWidth: 3,
+                  stroke: '#fff',
+                  fill: color,
+                };
+              }}
             />
-            <View style={styles.streaks}>
-            <View style={styles.streakItem}>
-                <Text style={styles.streakIcon}>🔥</Text>
-                <Text style={styles.streakText}>Current streak</Text>
-                <Text style={styles.streakValue}>{streakData.current}</Text>
-            </View>
-            <View style={styles.streakItem}>
-                <Text style={styles.streakIcon}>⭐</Text>
-                <Text style={styles.streakText}>Longest streak</Text>
-                <Text style={styles.streakValue}>{streakData.longest}</Text>
-            </View>
-            </View>
-        </View>
+            
+
+
+            )}
+          </View>
         )}
 
-        {/* Test Result */}
         {selectedTab === 'Test Result' && (
-        <View style={styles.testResult}>
-          {loadingResults ? (
-            <Text style={styles.testResultText}>Loading...</Text>
-          ) : testResults.length === 0 ? (
-            <Text style={styles.testResultText}>You haven't taken any test yet 📝</Text>
-          ) : (
-            testResults.map((result, index) => (
-              <View key={index} style={styles.resultCard}>
-                <Text style={styles.resultDate}>🗓 {new Date(result.created_at).toLocaleDateString()}</Text>
-                <Text>🔥 Emotional Exhaustion: {result.emotional_exhaustion_score} ({result.emotional_exhaustion_level})</Text>
-                <Text>🧊 Depersonalization: {result.depersonalization_score} ({result.depersonalization_level})</Text>
-                <Text>🌟 Personal Accomplishment: {result.personal_accomplishment_score} ({result.personal_accomplishment_level})</Text>
-                <Text style={{ fontWeight: 'bold', marginTop: 5 }}>🧠 Burnout Level: {result.burnout_level}</Text>
-              </View>
-            ))
-          )}
-        </View>
-      )}
+          <View style={styles.testResult}>
+            {loadingResults ? (
+              <Text style={styles.testResultText}>Loading...</Text>
+            ) : testResults.length === 0 ? (
+              <Text style={styles.testResultText}>You haven't taken any test yet 📝</Text>
+            ) : (
+              testResults.map((result, index) => (
+                <View key={index} style={styles.resultCard}>
+                  <Text style={styles.resultDate}>🗓 {new Date(result.created_at).toLocaleDateString()}</Text>
+                  <Text>🔥 Emotional Exhaustion: {result.emotional_exhaustion_score} ({result.emotional_exhaustion_level})</Text>
+                  <Text>🧊 Depersonalization: {result.depersonalization_score} ({result.depersonalization_level})</Text>
+                  <Text>🌟 Personal Accomplishment: {result.personal_accomplishment_score} ({result.personal_accomplishment_level})</Text>
+                  <Text style={{ fontWeight: 'bold', marginTop: 5 }}>🧠 Burnout Level: {result.burnout_level}</Text>
+                </View>
+              ))
+            )}
+          </View>
+        )}
+      </ScrollView>
 
-
-    </ScrollView>
-
-    {/* Bottom Navigation */}
-    <View style={styles.navbar}>
+      <View style={styles.navbar}>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('HomePlan')}>
-        <Image source={require('./assets/images/home.png')} style={styles.navIcon} />
+          <Image source={require('./assets/images/home.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Explore')}>
-        <Image source={require('./assets/images/search.png')} style={styles.navIcon} />
+          <Image source={require('./assets/images/search.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Chat')}>
-        <Image source={require('./assets/images/chat.png')} style={styles.navIcon} />
+          <Image source={require('./assets/images/chat.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Profile')}>
-        <Image source={require('./assets/images/profile_choose.png')} style={styles.navIcon} />
+          <Image source={require('./assets/images/profile_choose.png')} style={styles.navIcon} />
         </TouchableOpacity>
+      </View>
     </View>
-</View>
-
-
   );
 }
 
@@ -188,7 +252,7 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
         paddingHorizontal: 24,
-        justifyContent: 'center', 
+        justifyContent: 'top', 
     },
     logoBackground: {
         width: '100%',
@@ -246,7 +310,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'center',
       marginVertical: 10,
-      marginTop: 100,
+      marginTop: 24,
     },
     tabButton: {
       paddingVertical: 10,
@@ -265,11 +329,6 @@ const styles = StyleSheet.create({
     },
     activeTabText: {
       color: '#000',
-    },
-    moodColorsContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginVertical: 10,
     },
     moodColor: {
       width: 40,
@@ -351,6 +410,24 @@ const styles = StyleSheet.create({
       marginVertical: 2,
       color: '#444',
     },
+
+    moodButton: {
+      marginHorizontal: 5,
+      width: 48,   // Smaller button size
+      height: 48,
+      borderRadius: 24,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#B8CDD9',
+    },
+    selectedMood: {
+      backgroundColor: '#5D92B1',
+    },
+    moodImage: {
+      width: 28,   // Smaller image
+      height: 28,
+    },
+    
     
   });
   

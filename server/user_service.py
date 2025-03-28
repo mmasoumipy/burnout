@@ -44,11 +44,19 @@ def save_mood(mood_data: MoodSubmission, db: Session = Depends(get_db)):
         return {"message": "Mood saved successfully"}
 
 @router.get("/mood/{user_id}")
-def get_latest_mood(user_id: int, db: Session = Depends(get_db)):
-    mood = db.query(Mood).filter(Mood.user_id == user_id).order_by(Mood.created_at.desc()).first()
-    if not mood:
-        return {"message": "No mood found"}
-    return {"mood": mood.mood, "timestamp": mood.timestamp}
+def get_latest_moods(user_id: int, db: Session = Depends(get_db)):
+    moods = (
+        db.query(Mood)
+        .filter(Mood.user_id == user_id)
+        .order_by(Mood.created_at.asc())
+        .limit(10)
+        .all()
+    )
+    return [
+        {"mood": mood.mood, "timestamp": mood.created_at.isoformat()}
+        for mood in moods
+    ]
+
 
 
 @router.get("/tests/{user_id}")

@@ -66,9 +66,9 @@ export const submitMood = async (userId, mood) => {
 };
 
 // Fetch Mood Data by User ID
-export const getMoodData = async (userId) => {
+export const getMoodHistory = async (userId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/moods/${userId}`);
+    const response = await axios.get(`${BASE_URL}/mood/${userId}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching mood data:", error);
