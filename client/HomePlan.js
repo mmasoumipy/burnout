@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { UserContext } from './UserContext';
+import { submitMood } from './api';
 
 export default function HomePlan({ navigation }) {
     const { user } = useContext(UserContext);
@@ -16,9 +17,15 @@ export default function HomePlan({ navigation }) {
         { id: 'excited', label: 'Excited', image: require('./assets/images/excited.png') },
     ];
 
-    const handleMoodClick = (mood) => {
+    const handleMoodClick = async (mood) => {
         setSelectedMood(mood.id);
         alert(`You selected: ${mood.label}`);
+    
+        try {
+            await submitMood(user.id, mood.id);
+        } catch (error) {
+            console.error('Error saving mood:', error);
+        }
     };
 
     const courses = [

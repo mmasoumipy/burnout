@@ -13,6 +13,7 @@ export const loginUser = async (email, password) => {
   return axios.post(`${BASE_URL}/login`, { email, password });
 };
 
+// MBI TEST SERVICE
 // Fetch MBI Test Questions
 export const getTestQuestions = async () => {
   try {
@@ -38,6 +39,7 @@ export const submitTest = async (userId, responses) => {
   }
 };
 
+// USER SERVICES
 // Fetch Test Results by User ID
 export const getTestResults = async (userId) => {
   try {
@@ -45,6 +47,31 @@ export const getTestResults = async (userId) => {
     return response.data;
   } catch (error) {
     console.error("Error fetching results:", error);
+    return null;
+  }
+};
+
+// Submit Mood Data
+export const submitMood = async (userId, mood) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/mood`, {
+      user_id: userId,
+      mood: mood
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting mood:", error);
+    return null;
+  }
+};
+
+// Fetch Mood Data by User ID
+export const getMoodData = async (userId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/moods/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching mood data:", error);
     return null;
   }
 };

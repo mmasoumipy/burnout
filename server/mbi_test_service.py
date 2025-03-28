@@ -1,7 +1,7 @@
 from typing import List
 
 from database import engine, get_db
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, APIRouter
 from models import Response, Test, User, create_tables
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -11,9 +11,9 @@ from auth import router as auth_router
 # Base.metadata.create_all(bind=engine)
 create_tables()
 
-app = FastAPI()
+router = APIRouter()
 
-app.include_router(auth_router)
+
 
 MBI_QUESTIONS = [
     {"id": 1, "text": "I feel emotionally drained from my work.", "category": "emotional_exhaustion"},
@@ -48,11 +48,11 @@ class TestSubmission(BaseModel):
     user_id: int
     responses: List[ResponseSchema]
 
-@app.get("/test")
+@router.get("/test")
 def get_test():
     return {"questions": MBI_QUESTIONS}
 
-@app.post("/submit")
+@router.post("/submit")
 def submit_test(submission: TestSubmission, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == submission.user_id).first()
     if not user:
@@ -116,26 +116,3 @@ def submit_test(submission: TestSubmission, db: Session = Depends(get_db)):
         "personal_accomplishment_level": personal_accomplishment_level,
         "burnout_level": burnout_level
     }
-
-@app.get("/tests/{user_id}")
-def get_tests_by_user(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    tests = db.query(Test).filter(Test.user_id == user_id).order_by(Test.created_at.desc()).all()
-
-    return [
-        {
-            "id": test.id,
-            "created_at": test.created_at,
-            "emotional_exhaustion_score": test.emotional_exhaustion_score,
-            "emotional_exhaustion_level": test.emotional_exhaustion_level,
-            "depersonalization_score": test.depersonalization_score,
-            "depersonalization_level": test.depersonalization_level,
-            "personal_accomplishment_score": test.personal_accomplishment_score,
-            "personal_accomplishment_level": test.personal_accomplishment_level,
-            "burnout_level": test.burnout_level,
-        }
-        for test in tests
-    ]
