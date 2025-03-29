@@ -41,3 +41,22 @@ def login(user: LoginRequest, db: Session = Depends(get_db)):
                 "email": db_user.email
                 }
             }
+
+
+class PasswordUpdateRequest(BaseModel):
+    user_id: int
+    current_password: str
+    new_password: str
+
+@router.put("/update-password")
+def update_password(data: PasswordUpdateRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == data.user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if not verify_password(data.current_password, user.password):
+        raise HTTPException(status_code=401, detail="Current password is incorrect")
+
+    user.password = hash_password(data.new_password)
+    db.commit()
+    return {"message": "Password updated successfully"}

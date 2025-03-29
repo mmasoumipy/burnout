@@ -81,3 +81,16 @@ def get_tests_by_user(user_id: int, db: Session = Depends(get_db)):
         }
         for test in tests
     ]
+
+class NameUpdateRequest(BaseModel):
+    user_id: int
+    new_name: str
+
+@router.put("/update-name")
+def update_name(data: NameUpdateRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == data.user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.name = data.new_name
+    db.commit()
+    return {"message": "Name updated successfully"}

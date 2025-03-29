@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,27 +12,56 @@ import {
 } from 'react-native';
 import { UserContext } from './UserContext';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { updatePassword, updateName } from './api'; 
 
 
 export default function Setting({ navigation }) {
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [name, setName] = useState(user?.name || '');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [healthPermission, setHealthPermission] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
 
-  const handleNameUpdate = () => {
-    Alert.alert('Name updated successfully!');
-    // TODO: call API to update name
+  useEffect(() => {
+    if (user) {
+      setName(user.name);
+      setHealthPermission(user.healthPermission);
+    }
+  }, [user]);
+
+
+  const handleNameUpdate = async () => {
+    if (name.trim() === '') {
+      Alert.alert('Name cannot be empty');
+      return;
+    }
+  
+    try {
+      await updateName(user.id, name);
+      setUser({ ...user, name });
+      Alert.alert('Name updated successfully!');
+    } catch (err) {
+      Alert.alert('Error updating name', err.response?.data?.detail || 'Failed to update name');
+    }
   };
+  
 
   const handlePasswordUpdate = () => {
     if (newPassword !== confirmPassword) {
       Alert.alert('Passwords do not match');
       return;
     }
-    Alert.alert('Password updated successfully!');
-    // TODO: call API to update password
+    updatePassword(user.id, currentPassword, newPassword)
+      .then(() => {
+        Alert.alert('Password updated successfully!');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      })
+      .catch((err) => {
+        Alert.alert('Error updating password', err.response?.data?.detail || 'Failed to update password');
+      });
   };
 
   const handleHealthToggle = (value) => {
@@ -66,6 +95,13 @@ export default function Setting({ navigation }) {
         <TextInput
           style={styles.input}
           secureTextEntry
+          placeholder="Current password"
+          value={currentPassword}
+          onChangeText={setCurrentPassword}
+        />
+        <TextInput
+          style={styles.input}
+          secureTextEntry
           placeholder="New password"
           value={newPassword}
           onChangeText={setNewPassword}
@@ -77,19 +113,27 @@ export default function Setting({ navigation }) {
           value={confirmPassword}
           onChangeText={setConfirmPassword}
         />
-        <TouchableOpacity style={styles.button} onPress={handlePasswordUpdate}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={async () => {
+            if (newPassword !== confirmPassword) {
+              Alert.alert("Passwords do not match");
+              return;
+            }
+            try {
+              await updatePassword(user.id, currentPassword, newPassword);
+              Alert.alert("Password updated successfully");
+              setCurrentPassword('');
+              setNewPassword('');
+              setConfirmPassword('');
+            } catch (err) {
+              Alert.alert("Error", err.response?.data?.detail || "Failed to update password");
+            }
+          }}
+        >
           <Text style={styles.buttonText}>Update Password</Text>
         </TouchableOpacity>
 
-        <View style={styles.switchContainer}>
-          <Text style={styles.label}>Connect to Health App</Text>
-          <Switch
-            value={healthPermission}
-            onValueChange={handleHealthToggle}
-            trackColor={{ false: '#ccc', true: '#5D92B1' }}
-            thumbColor={healthPermission ? '#fff' : '#fff'}
-          />
-        </View>
       </View>
     </View>
   );

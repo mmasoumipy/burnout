@@ -43,7 +43,7 @@ export default function Chat({ navigation }) {
                     onPress={() => setActiveTab('Chatbot')}
                     >
                     <Text style={[styles.tabText, activeTab === 'Chatbot' && styles.activeTabText]}>
-                        chatbot-name
+                        Carely
                     </Text>
                     </TouchableOpacity>
                     <TouchableOpacity

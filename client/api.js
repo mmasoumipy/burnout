@@ -75,3 +75,20 @@ export const getMoodHistory = async (userId) => {
     return null;
   }
 };
+
+// Update Name
+export const updateName = async (userId, newName) => {
+  return axios.put(`${BASE_URL}/update-name`, {
+    user_id: userId,
+    new_name: newName,
+  });
+};
+
+// Update Password
+export const updatePassword = async (userId, currentPassword, newPassword) => {
+  return axios.put(`${BASE_URL}/update-password`, {
+    user_id: userId,
+    current_password: currentPassword,
+    new_password: newPassword,
+  });
+};
