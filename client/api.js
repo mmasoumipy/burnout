@@ -92,3 +92,52 @@ export const updatePassword = async (userId, currentPassword, newPassword) => {
     new_password: newPassword,
   });
 };
+
+// Create a new journal entry
+export const createJournalEntry = async (userId, title, content, analysis) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/journal`, {
+      user_id: userId,
+      title,
+      content,
+      analysis
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating journal entry:", error);
+    throw error;
+  }
+};
+
+// Get all journal entries for a user
+export const getJournalEntries = async (userId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/journal/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching journal entries:", error);
+    return [];
+  }
+};
+
+// Get a specific journal entry
+export const getJournalEntry = async (entryId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/journal/entry/${entryId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching journal entry:", error);
+    return null;
+  }
+};
+
+// Delete a journal entry
+export const deleteJournalEntry = async (entryId) => {
+  try {
+    const response = await axios.delete(`${BASE_URL}/journal/${entryId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting journal entry:", error);
+    throw error;
+  }
+};

@@ -12,3 +12,4 @@ class User(Base):
 
     moods = relationship("Mood", back_populates="user")
     tests = relationship("Test", back_populates="user")
+    journals = relationship("Journal", back_populates="user")

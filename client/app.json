@@ -23,6 +23,13 @@
     },
     "web": {
       "favicon": "./assets//images/favicon.png"
+    },
+    "plugins": [
+      "expo-audio"
+    ],
+    "extra": {
+      "OPENAI_API_KEY": "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",
+      "OPENAI_ASSISTANT_ID": "asst_mZHek32pP5WlMzN7A8B3fdVY"
     }
   }
 }
