@@ -59,69 +59,48 @@ export default function Chat({ navigation }) {
     }
   };
 
-  // Function to start recording for voice input
+  // Function to simulate voice input (temporary until audio recording is fixed)
   const startRecording = async () => {
     try {
-      // Request permission
-      const { status } = await Audio.requestPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission needed', 'Please grant permission to record audio');
-        return;
-      }
-
-      // Prepare recording
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-      
-      const newRecording = new Audio.Recording();
-      await newRecording.prepareToRecordAsync(Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY);
-      await newRecording.startAsync();
-      
-      setRecording(newRecording);
+      // Instead of actual recording, just show a simulated recording state
+      console.log('Simulating recording start...');
       setIsRecording(true);
+      
+      // Create a timeout to simulate a short recording
+      setTimeout(() => {
+        stopRecording();
+      }, 3000); // Simulate 3 seconds of recording
+      
+      Alert.alert('Voice Input', 'Voice recording is not working in this build. Using text input instead.');
+      
     } catch (error) {
-      console.error('Failed to start recording', error);
-      Alert.alert('Error', 'Failed to start recording');
+      console.error('Failed to simulate recording', error);
+      Alert.alert('Error', 'Voice input is not available. Please use text input instead.');
+      setIsRecording(false);
     }
   };
 
-  // Function to stop recording and process the audio
+  // Function to simulate stopping recording and processing the audio
   const stopRecording = async () => {
     try {
+      console.log('Stopping simulated recording...');
       setIsRecording(false);
-      setIsLoading(true);
+      setIsLoading(false);
       
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI();
+      // Use a placeholder text instead of actual transcription
+      const placeholderText = activeTab === 'Journal' 
+        ? "This is a sample journal entry. Voice transcription is not available in this build."
+        : "Tell me about burnout prevention techniques.";
       
-      // For journal entry
+      // Set the placeholder text in the appropriate field
       if (activeTab === 'Journal') {
-        const transcription = await transcribeAudio({
-          uri,
-          type: 'audio/m4a',
-          name: 'recording.m4a',
-        });
-        
-        setJournalInputText(transcription);
-      } 
-      // For chatbot
-      else {
-        const transcription = await transcribeAudio({
-          uri,
-          type: 'audio/m4a',
-          name: 'recording.m4a',
-        });
-        
-        setInputText(transcription);
-        await handleSendMessage(transcription);
+        setJournalInputText(placeholderText);
+      } else {
+        setInputText(placeholderText);
       }
       
-      setIsLoading(false);
     } catch (error) {
-      console.error('Failed to stop recording', error);
-      Alert.alert('Error', 'Failed to process your voice message');
+      console.error('Error in simulated recording stop:', error);
       setIsLoading(false);
       setIsRecording(false);
     }

@@ -16,6 +16,8 @@ if(!OPENAI_ASSISTANT_ID) {
 
 const OPENAI_API_URL = 'https://api.openai.com/v1';
 
+
+
 // Configure axios for OpenAI requests
 const openaiAxios = axios.create({
   baseURL: OPENAI_API_URL,
@@ -28,58 +30,78 @@ const openaiAxios = axios.create({
 // Function to send chat messages to OpenAI (for Carely chatbot)
 export const sendChatMessage = async (messages) => {
   try {
+    console.log('Sending chat message to OpenAI...');
+    console.log('API Key available:', !!OPENAI_API_KEY);
+    console.log('Messages structure:', JSON.stringify(messages, null, 2));
+    
     const response = await openaiAxios.post('/chat/completions', {
-      model: 'gpt-3.5-turbo', // You can change this to gpt-3.5-turbo for lower cost
+      model: 'gpt-4-turbo', // You can change this to gpt-3.5-turbo for lower cost
       messages: messages,
       max_tokens: 500
     });
     
+    console.log('OpenAI response received');
     return response.data.choices[0].message.content;
   } catch (error) {
     console.error('Error sending chat message to OpenAI:', error);
+    console.error('Error response data:', error.response?.data);
+    console.error('Error response status:', error.response?.status);
+    
+    // Use fallback model if the selected model isn't available
+    if (error.response?.data?.error?.code === 'model_not_available') {
+      console.log('Attempting with fallback model gpt-3.5-turbo...');
+      try {
+        const fallbackResponse = await openaiAxios.post('/chat/completions', {
+          model: 'gpt-3.5-turbo', // Fallback to a more widely available model
+          messages: messages,
+          max_tokens: 500
+        });
+        return fallbackResponse.data.choices[0].message.content;
+      } catch (fallbackError) {
+        console.error('Fallback request also failed:', fallbackError);
+        throw fallbackError;
+      }
+    }
+    
     throw error;
   }
 };
 
-// Alternative function to use OpenAI Assistant API instead of chat completions
+// Let's use a simpler chat completion approach for now instead of Assistants API
 export const sendAssistantMessage = async (message, threadId = null) => {
   try {
-    // Create a thread if one doesn't exist
-    if (!threadId) {
-      const threadResponse = await openaiAxios.post('/threads', {});
-      threadId = threadResponse.data.id;
-    }
+    console.log('Using simpler chat completion as fallback...');
     
-    // Add message to thread
-    await openaiAxios.post(`/threads/${threadId}/messages`, {
+    // Create system message for context
+    const systemMessage = {
+      role: 'system',
+      content: `You are Carely, a wellness companion for medical professionals. 
+                Be empathetic, supportive, and provide wellness advice tailored to healthcare workers. 
+                Keep responses concise and friendly.`
+    };
+    
+    // Create user message
+    const userMessage = {
       role: 'user',
       content: message
+    };
+    
+    // Send as a regular chat completion
+    const response = await openaiAxios.post('/chat/completions', {
+      model: 'gpt-3.5-turbo', // More reliable model
+      messages: [systemMessage, userMessage],
+      max_tokens: 500
     });
     
-    // Run the assistant on the thread
-    const runResponse = await openaiAxios.post(`/threads/${threadId}/runs`, {
-      assistant_id: OPENAI_ASSISTANT_ID
-    });
-    
-    const runId = runResponse.data.id;
-    
-    // Poll for completion (simplified - in production you'd want to use a better approach)
-    let runStatus = await pollRunStatus(threadId, runId);
-    
-    // Get messages from the thread
-    const messagesResponse = await openaiAxios.get(`/threads/${threadId}/messages`);
-    
-    // Return the latest assistant message
-    const assistantMessages = messagesResponse.data.data.filter(
-      msg => msg.role === 'assistant'
-    );
+    console.log('Chat completion successful');
     
     return {
-      threadId,
-      message: assistantMessages.length > 0 ? assistantMessages[0].content[0].text.value : null
+      threadId: null, // No thread concept in regular chat completions
+      message: response.data.choices[0].message.content
     };
   } catch (error) {
-    console.error('Error using OpenAI Assistant:', error);
+    console.error('Error using chat completion fallback:', error);
+    console.error('Error response data:', error.response?.data);
     throw error;
   }
 };
@@ -106,12 +128,23 @@ const pollRunStatus = async (threadId, runId, maxAttempts = 10) => {
 // Function to transcribe audio using Whisper API
 export const transcribeAudio = async (audioFile) => {
   try {
+    console.log('Preparing audio transcription with file:', audioFile);
+    
+    // Validate the audio file
+    if (!audioFile || !audioFile.uri) {
+      throw new Error('Invalid audio file object');
+    }
+    
     // Create form data to send the audio file
     const formData = new FormData();
     formData.append('file', audioFile);
     formData.append('model', 'whisper-1');
     
-    const response = await axios.post(`${OPENAI_API_URL}/audio/transcriptions`, 
+    console.log('Sending transcription request to OpenAI...');
+    console.log('API URL:', `${OPENAI_API_URL}/audio/transcriptions`);
+    
+    const response = await axios.post(
+      `${OPENAI_API_URL}/audio/transcriptions`, 
       formData,
       {
         headers: {
@@ -121,10 +154,17 @@ export const transcribeAudio = async (audioFile) => {
       }
     );
     
+    console.log('Transcription response received:', response.data);
+    
+    if (!response.data || !response.data.text) {
+      throw new Error('Invalid response from transcription service');
+    }
+    
     return response.data.text;
   } catch (error) {
     console.error('Error transcribing audio with Whisper:', error);
-    throw error;
+    console.error('Error details:', error.response ? error.response.data : 'No response data');
+    throw new Error(`Transcription failed: ${error.message}`);
   }
 };
 
