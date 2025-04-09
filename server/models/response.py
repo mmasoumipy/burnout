@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from models.base import Base
-from models.test import Test
 
 class Response(Base):
     __tablename__ = "responses"
@@ -10,4 +9,4 @@ class Response(Base):
     question_id = Column(Integer)
     score = Column(Integer)
 
-    test = relationship("Test")
+    test = relationship("Test", back_populates="responses")

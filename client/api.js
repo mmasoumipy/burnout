@@ -7,7 +7,6 @@ export const registerUser = async (name, email, password) => {
   return axios.post(`${BASE_URL}/register`, { name, email, password });
 };
 
-
 // Login User
 export const loginUser = async (email, password) => {
   return axios.post(`${BASE_URL}/login`, { email, password });
@@ -25,16 +24,71 @@ export const getTestQuestions = async () => {
   }
 };
 
-// Submit User Responses
-export const submitTest = async (userId, responses) => {
+// Start a new test and get its ID
+export const startTest = async (userId) => {
   try {
-    const response = await axios.post(`${BASE_URL}/submit`, {
-      user_id: userId,
-      responses: responses
+    const response = await axios.post(`${BASE_URL}/start-test`, { user_id: userId });
+    return response.data.test_id;
+  } catch (error) {
+    console.error("Error starting test:", error);
+    throw error;
+  }
+};
+
+// Save a response for a test in progress
+export const saveResponse = async (testId, questionId, score) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/save-response`, {
+      test_id: testId,
+      question_id: questionId,
+      score: score
     });
     return response.data;
   } catch (error) {
+    console.error("Error saving response:", error);
+    throw error;
+  }
+};
+
+// Submit User Responses (complete test)
+export const submitTest = async (userId, responses, testId = null) => {
+  try {
+    const payload = {
+      user_id: userId,
+      responses: responses
+    };
+    
+    // Include test_id if provided (for completing an in-progress test)
+    if (testId) {
+      payload.test_id = testId;
+    }
+    
+    const response = await axios.post(`${BASE_URL}/submit`, payload);
+    return response.data;
+  } catch (error) {
     console.error("Error submitting test:", error);
+    return null;
+  }
+};
+
+// Get test progress for a specific test
+export const getTestProgress = async (testId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/test-progress/${testId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching test progress:", error);
+    return { responses: {} };
+  }
+};
+
+// Get user's in-progress test if it exists
+export const getInProgressTest = async (userId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/in-progress-test/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching in-progress test:", error);
     return null;
   }
 };
@@ -47,7 +101,7 @@ export const getTestResults = async (userId) => {
     return response.data;
   } catch (error) {
     console.error("Error fetching results:", error);
-    return null;
+    return [];
   }
 };
 
@@ -72,7 +126,7 @@ export const getMoodHistory = async (userId) => {
     return response.data;
   } catch (error) {
     console.error("Error fetching mood data:", error);
-    return null;
+    return [];
   }
 };
 
@@ -142,12 +196,10 @@ export const deleteJournalEntry = async (entryId) => {
   }
 };
 
-
 // Submit Micro Assessment
 export const submitMicroAssessment = async (data) => {
   try {
     const response = await axios.post(`${BASE_URL}/micro-assessment`, data);
-    console.log("Micro assessment submitted successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error submitting micro assessment:", error);
@@ -185,5 +237,21 @@ export const getMicroAssessmentTrend = async (userId, days = 30) => {
   } catch (error) {
     console.error("Error fetching micro assessment trend:", error);
     return null;
+  }
+};
+
+// Get user streak information
+export const getUserStreaks = async (userId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/streaks/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user streaks:", error);
+    return {
+      currentStreak: 0,
+      longestStreak: 0,
+      weeklyCheckIns: 0,
+      totalAssessments: 0
+    };
   }
 };
