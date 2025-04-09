@@ -436,7 +436,7 @@ export default function Profile({ navigation }) {
               
               <TouchableOpacity 
                 style={styles.recommendationButton}
-                onPress={() => navigation.navigate('MicroResilience')}
+                onPress={() => navigation.navigate('MicroAssessment')}
               >
                 <Text style={styles.recommendationButtonText}>
                   Try Micro-Resilience Exercises
