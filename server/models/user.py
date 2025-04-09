@@ -13,3 +13,5 @@ class User(Base):
     moods = relationship("Mood", back_populates="user")
     tests = relationship("Test", back_populates="user")
     journals = relationship("Journal", back_populates="user")
+    micro_assessments = relationship("MicroAssessment", back_populates="user")
+    

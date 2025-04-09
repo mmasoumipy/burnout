@@ -6,10 +6,8 @@ from models import Response, Test, User, create_tables
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from auth import router as auth_router
 
-# Base.metadata.create_all(bind=engine)
-create_tables()
+
 
 router = APIRouter()
 
