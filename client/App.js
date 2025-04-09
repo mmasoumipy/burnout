@@ -15,6 +15,7 @@ import Profile from './Profile';
 import TakeTest from './TakeTest';
 import Register from './Register';
 import Setting from './Setting';
+import MicroAssessment from './MicroAssessment';
 import { UserProvider } from './UserContext';
 
 const Stack = createStackNavigator();
@@ -36,6 +37,7 @@ export default function App() {
           <Stack.Screen name="TakeTest" component={TakeTest} />
           <Stack.Screen name="Register" component={Register} />
           <Stack.Screen name="Setting" component={Setting} />
+          <Stack.Screen name="MicroAssessment" component={MicroAssessment} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>

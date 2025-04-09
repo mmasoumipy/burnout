@@ -107,6 +107,17 @@ export default function HomePlan({ navigation }) {
                         <Image source={courses[3].image} style={styles.courseImage} />
                     </TouchableOpacity>
 
+                    <TouchableOpacity
+                        style={styles.courseCard}
+                        onPress={() => navigation.navigate('MicroAssessment')}
+                        >
+                        <View style={styles.courseTextContainer}>
+                            <Text style={styles.courseTitle}>Quick Wellness Check</Text>
+                            <Text style={styles.courseSubtitle}>2-min assessment</Text>
+                        </View>
+                        <Image source={courses[3].image} style={styles.courseImage} />
+                    </TouchableOpacity>
+
                     <Text style={styles.sectionTitle}>Night's Calm</Text>
                     <TouchableOpacity style={styles.courseCard} onPress={() => handleCourseClick(courses[4])}>
                         <View style={styles.courseTextContainer}>

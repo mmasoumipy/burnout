@@ -141,3 +141,49 @@ export const deleteJournalEntry = async (entryId) => {
     throw error;
   }
 };
+
+
+// Submit Micro Assessment
+export const submitMicroAssessment = async (data) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/micro-assessment`, data);
+    console.log("Micro assessment submitted successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting micro assessment:", error);
+    throw error;
+  }
+};
+
+// Get Micro Assessments for a user
+export const getMicroAssessments = async (userId, limit = 10) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/micro-assessment/${userId}?limit=${limit}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching micro assessments:", error);
+    return [];
+  }
+};
+
+// Get latest Micro Assessment for a user
+export const getLatestMicroAssessment = async (userId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/micro-assessment/latest/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching latest micro assessment:", error);
+    return null;
+  }
+};
+
+// Get Micro Assessment trend analysis
+export const getMicroAssessmentTrend = async (userId, days = 30) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/micro-assessment/trend/${userId}?days=${days}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching micro assessment trend:", error);
+    return null;
+  }
+};
