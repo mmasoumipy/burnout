@@ -483,12 +483,9 @@ export default function Profile({ navigation }) {
           <Text style={styles.userName}>{user?.name || 'User'}</Text>
         </View>
       </View>
-
+  
       <View style={styles.mainContent}>
         <ScrollView contentContainerStyle={styles.content}>
-          {/* Streak Metrics Section */}
-          {renderStreakMetrics()}
-        
           <View style={styles.tabs}>
             <TouchableOpacity
               style={[styles.tabButton, selectedTab === 'Mood Tracker' && styles.activeTab]}
@@ -506,7 +503,7 @@ export default function Profile({ navigation }) {
               <Text style={[styles.tabText, selectedTab === 'Test Result' && styles.activeTabText]}>Test Result</Text>
             </TouchableOpacity>
           </View>
-
+  
           {selectedTab === 'Mood Tracker' && (
             <View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginBottom: 20 }}>
@@ -520,7 +517,7 @@ export default function Profile({ navigation }) {
                   </TouchableOpacity>
                 ))}
               </View>
-
+  
               {moodHistory.length > 0 && (
                 <LineChart
                   data={moodChartData}
@@ -567,9 +564,12 @@ export default function Profile({ navigation }) {
                   }}
                 />
               )}
+              
+              {/* Streak Metrics Section - Moved here after the mood graph */}
+              {renderStreakMetrics()}
             </View>
           )}
-
+  
           {selectedTab === 'Test Result' && (
             <View style={styles.testResult}>
               {loadingResults ? (
@@ -584,7 +584,7 @@ export default function Profile({ navigation }) {
           )}
         </ScrollView>
       </View>
-
+  
       <View style={styles.navbar}>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('HomePlan')}>
           <Image source={require('./assets/images/home.png')} style={styles.navIcon} />
