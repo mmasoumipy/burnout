@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { 
   StyleSheet, 
   View, 
@@ -10,12 +10,36 @@ import {
   Alert 
 } from 'react-native';
 import { UserContext } from './UserContext';
-import { saveUserReasons } from './api';
+import { saveUserReasons, getUserProfile } from './api';
 
 export default function Reason({ navigation }) {
   const { user } = useContext(UserContext);
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+
+  useEffect(() => {
+    // Load user's previously selected reasons if any
+    const loadUserReasons = async () => {
+      if (!user?.id) {
+        setIsInitialLoading(false);
+        return;
+      }
+
+      try {
+        const userProfile = await getUserProfile(user.id);
+        if (userProfile.reasons && userProfile.reasons.length > 0) {
+          setSelectedOptions(userProfile.reasons);
+        }
+      } catch (error) {
+        console.error('Error loading user reasons:', error);
+      } finally {
+        setIsInitialLoading(false);
+      }
+    };
+
+    loadUserReasons();
+  }, [user]);
 
   const options = [
     {
@@ -101,6 +125,11 @@ export default function Reason({ navigation }) {
     }
   };
 
+  const handleSkip = () => {
+    // Skip this screen and go to home plan
+    navigation.navigate('HomePlan');
+  };
+
   const renderOption = ({ item }) => {
     const isSelected = selectedOptions.includes(item.id);
     return (
@@ -122,6 +151,14 @@ export default function Reason({ navigation }) {
     );
   };
 
+  if (isInitialLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#5D92B1" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Image source={require('./assets/images/logo.jpg')} style={styles.backgroundImage} />
@@ -130,6 +167,7 @@ export default function Reason({ navigation }) {
       <View style={styles.content}>
         <Text style={styles.title}>What brings you to WellMed?</Text>
         <Text style={styles.subtitle}>Select all that apply to personalize your experience</Text>
+        <Text style={styles.optionalText}>This step is optional but helps us tailor content to your needs</Text>
 
         <FlatList
           data={options}
@@ -141,6 +179,13 @@ export default function Reason({ navigation }) {
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity 
+            style={styles.skipButton} 
+            onPress={handleSkip}
+          >
+            <Text style={styles.skipButtonText}>Skip for now</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
             style={[
               styles.continueButton, 
               selectedOptions.length === 0 && styles.disabledButton
@@ -151,9 +196,7 @@ export default function Reason({ navigation }) {
             {isLoading ? (
               <ActivityIndicator color="#FFFFFF" />
             ) : (
-              <Text style={styles.buttonText}>
-                {selectedOptions.length === 0 ? 'Please select at least one option' : 'Continue'}
-              </Text>
+              <Text style={styles.buttonText}>Continue</Text>
             )}
           </TouchableOpacity>
         </View>
@@ -165,6 +208,11 @@ export default function Reason({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   backgroundImage: {
     position: 'absolute',
@@ -190,8 +238,15 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     textAlign: 'center',
-    marginVertical: 10,
+    marginVertical: 5,
     color: '#666',
+  },
+  optionalText: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: '#888',
+    fontStyle: 'italic',
+    marginBottom: 10,
   },
   list: {
     flex: 1,
@@ -259,20 +314,36 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   buttonContainer: {
+    flexDirection: 'row',
     padding: 16,
+    justifyContent: 'space-between',
   },
   continueButton: {
     backgroundColor: '#5D92B1',
     paddingVertical: 15,
     borderRadius: 25,
     alignItems: 'center',
-    marginTop: 10,
+    flex: 1,
+    marginLeft: 10,
+  },
+  skipButton: {
+    backgroundColor: '#E0E0E0',
+    paddingVertical: 15,
+    borderRadius: 25,
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 10,
   },
   disabledButton: {
     backgroundColor: '#B8CDD9',
   },
   buttonText: {
     color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  skipButtonText: {
+    color: '#666',
     fontSize: 16,
     fontWeight: '600',
   },

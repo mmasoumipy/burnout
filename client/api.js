@@ -255,3 +255,40 @@ export const getUserStreaks = async (userId) => {
     };
   }
 };
+
+
+// Get user profile information
+export const getUserProfile = async (userId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/user-profile/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    throw error;
+  }
+};
+
+// If not already in your api.js file, add the saveUserProfile function
+export const saveUserProfile = async (profileData) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/save-profile`, profileData);
+    return response.data;
+  } catch (error) {
+    console.error("Error saving user profile:", error);
+    throw error;
+  }
+};
+
+// If not already in your api.js file, add the saveUserReasons function
+export const saveUserReasons = async (userId, reasons) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/save-reasons`, {
+      user_id: userId,
+      reasons: reasons
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error saving user reasons:", error);
+    throw error;
+  }
+};

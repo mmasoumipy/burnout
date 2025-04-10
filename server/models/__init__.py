@@ -5,4 +5,3 @@ from .response import Response
 from .mood import Mood
 from .journal import Journal
 from .micro_assessment import MicroAssessment
-
