@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { UserContext } from './UserContext';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { updatePassword, updateName } from './api'; 
+import { updatePassword, updateName, updateHealthPermission } from './api'; 
 
 
 export default function Setting({ navigation }) {
@@ -20,13 +20,13 @@ export default function Setting({ navigation }) {
   const [name, setName] = useState(user?.name || '');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [healthPermission, setHealthPermission] = useState(false);
+  const [healthPermission, setHealthPermission] = useState(user?.healthPermission || false);
   const [currentPassword, setCurrentPassword] = useState('');
 
   useEffect(() => {
     if (user) {
       setName(user.name);
-      setHealthPermission(user.healthPermission);
+      setHealthPermission(user.healthPermission || false);
     }
   }, [user]);
 
@@ -47,27 +47,49 @@ export default function Setting({ navigation }) {
   };
   
 
-  const handlePasswordUpdate = () => {
+  const handlePasswordUpdate = async () => {
     if (newPassword !== confirmPassword) {
       Alert.alert('Passwords do not match');
       return;
     }
-    updatePassword(user.id, currentPassword, newPassword)
-      .then(() => {
-        Alert.alert('Password updated successfully!');
-        setCurrentPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
-      })
-      .catch((err) => {
-        Alert.alert('Error updating password', err.response?.data?.detail || 'Failed to update password');
-      });
+    try {
+      await updatePassword(user.id, currentPassword, newPassword);
+      Alert.alert('Password updated successfully!');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err) {
+      Alert.alert('Error updating password', err.response?.data?.detail || 'Failed to update password');
+    }
   };
 
-  const handleHealthToggle = (value) => {
-    setHealthPermission(value);
-    Alert.alert(value ? 'Connected to Health app' : 'Disconnected from Health app');
-    // TODO: handle permission logic
+  const handleHealthToggle = async (value) => {
+    try {
+      setHealthPermission(value);
+      
+      // Only call the API if the user is logged in
+      if (user?.id) {
+        await updateHealthPermission(user.id, value);
+        
+        // Update user context WITHOUT triggering other effects
+        const updatedUser = {...user};
+        updatedUser.healthPermission = value;
+        setUser(updatedUser);
+        
+        // Show appropriate message
+        Alert.alert(
+          value ? 'Health Data Connected' : 'Health Data Disconnected',
+          value ? 'Your smart watch data will now be synced with WellMed.' : 
+                  'Your smart watch data will no longer be synced with WellMed.'
+        );
+      }
+    } catch (error) {
+      console.error('Error updating health permission:', error);
+      Alert.alert('Error', 'Failed to update health permission settings');
+      
+      // Reset switch if the API call failed
+      setHealthPermission(!value);
+    }
   };
 
   return (
@@ -92,7 +114,7 @@ export default function Setting({ navigation }) {
         </TouchableOpacity>
 
         <Text style={styles.label}>Change Password</Text>
-        <TextInput
+        <Text
           style={styles.input}
           secureTextEntry
           placeholder="Current password"
@@ -115,25 +137,46 @@ export default function Setting({ navigation }) {
         />
         <TouchableOpacity
           style={styles.button}
-          onPress={async () => {
-            if (newPassword !== confirmPassword) {
-              Alert.alert("Passwords do not match");
-              return;
-            }
-            try {
-              await updatePassword(user.id, currentPassword, newPassword);
-              Alert.alert("Password updated successfully");
-              setCurrentPassword('');
-              setNewPassword('');
-              setConfirmPassword('');
-            } catch (err) {
-              Alert.alert("Error", err.response?.data?.detail || "Failed to update password");
-            }
-          }}
+          onPress={handlePasswordUpdate}
         >
           <Text style={styles.buttonText}>Update Password</Text>
         </TouchableOpacity>
 
+        <Text style={styles.label}>Connect to Smart Watch</Text>
+        <View style={styles.switchContainer}>
+          <Text>Share health metrics from your smart watch to help monitor your wellness</Text>
+          <Switch
+            value={healthPermission}
+            onValueChange={handleHealthToggle}
+            trackColor={{ false: '#ccc', true: '#5D92B1' }}
+            thumbColor={healthPermission ? '#fff' : '#f4f3f4'}
+          />
+        </View>
+
+        {healthPermission && (
+          <View style={styles.healthPermissionsContainer}>
+            <Text style={styles.healthPermissionsTitle}>Health Data Being Collected:</Text>
+            <View style={styles.healthPermissionItem}>
+              <Icon name="heart" size={20} color="#5D92B1" />
+              <Text style={styles.healthPermissionText}>Heart Rate</Text>
+            </View>
+            <View style={styles.healthPermissionItem}>
+              <Icon name="moon" size={20} color="#5D92B1" />
+              <Text style={styles.healthPermissionText}>Sleep Duration & Quality</Text>
+            </View>
+            <View style={styles.healthPermissionItem}>
+              <Icon name="walk" size={20} color="#5D92B1" />
+              <Text style={styles.healthPermissionText}>Physical Activity</Text>
+            </View>
+            <View style={styles.healthPermissionItem}>
+              <Icon name="pulse" size={20} color="#5D92B1" />
+              <Text style={styles.healthPermissionText}>Stress Levels (HRV)</Text>
+            </View>
+            <Text style={styles.healthPermissionsNote}>
+              This data helps us identify patterns in your wellness and can alert you to potential burnout risks.
+            </Text>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -208,6 +251,37 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 30,
+    marginVertical: 15,
+    backgroundColor: '#f8f8f8',
+    padding: 15,
+    borderRadius: 10,
+  },
+  healthPermissionsContainer: {
+    backgroundColor: '#f8f8f8',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  healthPermissionsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 10,
+    color: '#333',
+  },
+  healthPermissionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  healthPermissionText: {
+    marginLeft: 10,
+    fontSize: 14,
+    color: '#333',
+  },
+  healthPermissionsNote: {
+    marginTop: 10,
+    fontSize: 12,
+    fontStyle: 'italic',
+    color: '#666',
   },
 });

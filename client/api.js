@@ -292,3 +292,44 @@ export const saveUserReasons = async (userId, reasons) => {
     throw error;
   }
 };
+
+
+// SMART WATCH AND HEALTH DATA SERVICES
+// Update health permission setting
+export const updateHealthPermission = async (userId, enabled) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/update-health-permission`, {
+      user_id: userId,
+      enabled: enabled
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating health permission:", error);
+    throw error;
+  }
+};
+
+// Sync health data from smart watch
+export const syncHealthData = async (userId, healthData) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/sync-health-data`, {
+      user_id: userId,
+      health_data: healthData
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error syncing health data:", error);
+    throw error;
+  }
+};
+
+// Get health metrics for dashboard/analysis
+export const getHealthMetrics = async (userId, timeRange = '7d') => {
+  try {
+    const response = await axios.get(`${BASE_URL}/health-metrics/${userId}?timeRange=${timeRange}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching health metrics:", error);
+    return null;
+  }
+};

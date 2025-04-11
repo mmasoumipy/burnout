@@ -50,3 +50,4 @@ class User(Base):
     tests = relationship("Test", back_populates="user")
     journals = relationship("Journal", back_populates="user")
     micro_assessments = relationship("MicroAssessment", back_populates="user")
+    health_data = relationship("HealthData", back_populates="user")

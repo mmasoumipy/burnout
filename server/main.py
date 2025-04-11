@@ -5,6 +5,7 @@ from user_service import router as user_router
 from journal_service import router as journal_router
 from micro_assessment_service import router as micro_assessment_router
 from streak_service import router as streak_router
+from health_service import router as health_router
 
 from models import Response, Test, User, create_tables
 
@@ -24,6 +25,7 @@ app.include_router(user_router)
 app.include_router(journal_router)
 app.include_router(micro_assessment_router)
 app.include_router(streak_router)
+app.include_router(health_router)
 
 ## Mount each sub-app if needed
 # app.mount("/mbi", mbi_app)
